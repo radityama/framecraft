@@ -4,6 +4,7 @@
   "scripts": {
     "snap": "bun scripts/spike.ts still",
     "render": "bun scripts/spike.ts render",
+    "validate": "bun scripts/validate.ts",
     "test": "bun test"
   },
   "dependencies": {
