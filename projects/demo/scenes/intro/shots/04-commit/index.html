@@ -43,11 +43,6 @@
     margin-left: 0.08em;
     vertical-align: -0.18em;
     background: var(--fg);
-    animation: blink 1s steps(1, end) infinite;
-  }
-  @keyframes blink {
-    0%, 49% { opacity: 1; }
-    50%, 100% { opacity: 0; }
   }
   .output {
     color: var(--accent);
@@ -79,6 +74,7 @@
   <script>
     const COMMAND = 'git commit -m "ship it"';
     const typed = document.getElementById('typed');
+    const cursor = document.querySelector('.cursor');
     const rule = document.getElementById('rule');
 
     const timeline = gsap.timeline({ paused: true });
@@ -89,6 +85,7 @@
       renderFrame(ctx) {
         const typedChars = Math.min(COMMAND.length, Math.floor((ctx.frame / 60) * COMMAND.length));
         typed.textContent = COMMAND.slice(0, typedChars);
+        cursor.style.opacity = ctx.frame % ctx.fps < ctx.fps / 2 ? '1' : '0';
       },
       dispose() {
         timeline.kill();

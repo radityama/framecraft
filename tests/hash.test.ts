@@ -28,6 +28,10 @@ test('hash records twelve rendered frames, font metadata, and renderer environme
     for (const font of report.environment.fonts || []) expect(font).toEqual({family: expect.any(String), file: expect.any(String)});
     expect(Object.keys(report.frames)).toEqual(['title:0', 'title:30', 'title:59', 'diagram:0', 'diagram:30', 'diagram:70', 'close:0', 'close:59', 'commit:0', 'commit:30', 'commit:75', 'commit:119']);
     for (const hash of Object.values(report.frames)) expect(hash).toMatch(/^[a-f0-9]{64}$/);
+    for (let attempt = 0; attempt < 2; attempt++) {
+      expect((await run()).exitCode).toBe(0);
+      expect(JSON.parse(await readFile(reportFile, 'utf8')).frames).toEqual(report.frames);
+    }
     const failed = await run(join(temp, 'missing-chrome'));
     expect(failed.exitCode).not.toBe(0);
     expect(await bundles()).toEqual([]);

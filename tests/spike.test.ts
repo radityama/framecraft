@@ -43,6 +43,23 @@ test('diagram reverse seek 70,10,70 preserves identical pixels', async () => {
   expect(first.equals(middle)).toBe(false);
 });
 
+test('commit cursor renders the same pixels when frame 30 is revisited', async () => {
+  await page.evaluate(() => (window as any).mount('/projects/demo/scenes/intro/shots/04-commit/index.html', {id:'commit',fps:30,durationFrames:120,width:1920,height:1080}));
+  const opacity = () => page.frameLocator('iframe').locator('.cursor').evaluate(cursor => getComputedStyle(cursor).opacity);
+  const read = async () => {
+    await page.evaluate(() => (window as any).seek(30));
+    return page.locator('iframe').screenshot();
+  };
+  await page.evaluate(() => (window as any).seek(0));
+  expect(await opacity()).toBe('1');
+  const first = await read();
+  expect(await opacity()).toBe('1');
+  await page.evaluate(() => (window as any).seek(15));
+  expect(await opacity()).toBe('0');
+  await page.evaluate(() => (window as any).seek(0));
+  expect((await read()).equals(first)).toBe(true);
+});
+
 test('shot exception rejects a seek', async () => {
   await page.evaluate(() => (window as any).mount('/tests/fixtures/failing.html', {id:'bad',fps:30,durationFrames:90,width:1920,height:1080}));
   await expect(page.evaluate(() => (window as any).seek(10))).rejects.toThrow('Injected shot failure');
