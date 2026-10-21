@@ -1,0 +1,8 @@
+<!doctype html><html><script src="../../projects/demo/runtime.js"></script><script>
+const timeline = name => ({time(seconds, suppressEvents) {
+  if (suppressEvents !== false) throw new Error('Timeline events were suppressed');
+  document.body.dataset[name] = String(seconds);
+}});
+framecraft.timeline(timeline('registered'));
+framecraft.shot({timelines: [timeline('legacy')], renderFrame() {}});
+</script></html>

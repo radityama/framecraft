@@ -2,6 +2,7 @@
   let shot;
   let settings;
   let preparation;
+  const timelines = [];
   let milliseconds = 0;
   const requestFrame = window.requestAnimationFrame.bind(window);
   const epoch = 1700000000000;
@@ -16,6 +17,7 @@
     return () => ((seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 4294967296);
   };
   window.framecraft = {
+    timeline(timeline) { timelines.push(timeline); },
     shot(definition) {
       if (shot || typeof definition?.renderFrame !== 'function') throw new Error('Register exactly one shot with renderFrame(ctx)');
       shot = definition;
@@ -45,7 +47,7 @@
           animation.pause();
           animation.currentTime = seconds * 1000;
         }
-        for (const timeline of shot.timelines || []) timeline.time(seconds, false);
+        for (const timeline of [...timelines, ...(shot.timelines || [])]) timeline.time(seconds, false);
         send('rendered', {frame});
       } catch (error) { failure(error); }
     }

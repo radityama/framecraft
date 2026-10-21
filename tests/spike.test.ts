@@ -75,3 +75,14 @@ test('progress includes first, midpoint and final frames including a single-fram
   await mount(1);
   expect(await progress(0)).toBe(1);
 });
+
+test('registered and legacy timelines seek to the same local time', async () => {
+  await page.evaluate(() => (window as any).mount('/tests/fixtures/timelines.html', {id:'timeline',fps:30,durationFrames:90,width:1920,height:1080}));
+  const read = async (frame: number) => {
+    await page.evaluate(frame => (window as any).seek(frame), frame);
+    return page.frameLocator('iframe').locator('body').evaluate(body => ({registered: body.dataset.registered, legacy: body.dataset.legacy}));
+  };
+  expect(await read(70)).toEqual({registered: String(70 / 30), legacy: String(70 / 30)});
+  expect(await read(10)).toEqual({registered: String(10 / 30), legacy: String(10 / 30)});
+  expect(await read(70)).toEqual({registered: String(70 / 30), legacy: String(70 / 30)});
+});
