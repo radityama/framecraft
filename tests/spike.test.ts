@@ -44,3 +44,34 @@ test('missing acknowledgement times out', async () => {
   await page.evaluate(() => (window as any).mount('/tests/fixtures/silent.html', {id:'silent',fps:30,durationFrames:90,width:1920,height:1080}));
   await expect(page.evaluate(() => (window as any).seek(10))).rejects.toThrow('Timeout waiting for rendered 10');
 });
+
+test('shot clocks and random calls repeat on reverse seek', async () => {
+  await page.evaluate(() => (window as any).mount('/tests/fixtures/deterministic.html', {id:'clock',fps:30,durationFrames:90,width:1920,height:1080}));
+  const read = async (frame: number) => {
+    await page.evaluate(frame => (window as any).seek(frame), frame);
+    return JSON.parse(await page.frameLocator('iframe').locator('body').innerText());
+  };
+  const first = await read(70);
+  const middle = await read(10);
+  const last = await read(70);
+  expect(first).toEqual(last);
+  expect(first.date).toBe(1700000000000 + 70 / 30 * 1000);
+  expect(first.performance).toBe(70 / 30 * 1000);
+  expect(first.timestamp).toBe(70 / 30 * 1000);
+  expect(first.random).not.toBe(middle.random);
+  expect(first.contextRandom).not.toBe(middle.contextRandom);
+});
+
+test('progress includes first, midpoint and final frames including a single-frame shot', async () => {
+  const mount = (durationFrames: number) => page.evaluate(durationFrames => (window as any).mount('/tests/fixtures/deterministic.html', {id:'progress',fps:30,durationFrames,width:1920,height:1080}), durationFrames);
+  const progress = async (frame: number) => {
+    await page.evaluate(frame => (window as any).seek(frame), frame);
+    return JSON.parse(await page.frameLocator('iframe').locator('body').innerText()).progress;
+  };
+  await mount(3);
+  expect(await progress(0)).toBe(0);
+  expect(await progress(1)).toBe(0.5);
+  expect(await progress(2)).toBe(1);
+  await mount(1);
+  expect(await progress(0)).toBe(1);
+});

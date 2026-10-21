@@ -2,6 +2,12 @@
   let shot;
   let settings;
   let preparation;
+  let milliseconds = 0;
+  const requestFrame = window.requestAnimationFrame.bind(window);
+  const epoch = 1700000000000;
+  Date.now = () => epoch + milliseconds;
+  Object.defineProperty(performance, 'now', {value: () => milliseconds, configurable: true});
+  window.requestAnimationFrame = callback => requestFrame(() => callback(milliseconds));
   const send = (type, data = {}) => parent.postMessage({v: 1, type, ...data}, location.origin);
   const failure = (error) => send('error', {message: error instanceof Error ? error.stack || error.message : String(error)});
   const randomFor = (name, frame) => {
@@ -31,7 +37,9 @@
         const frame = data.frame;
         if (!Number.isSafeInteger(frame) || frame < 0 || frame >= settings.durationFrames) throw new Error(`Invalid shot frame: ${frame}`);
         const seconds = frame / settings.fps;
-        const ctx = {...settings, frame, seconds, progress: frame / settings.durationFrames, random: randomFor(settings.id, frame)};
+        milliseconds = seconds * 1000;
+        Math.random = randomFor(settings.id, frame);
+        const ctx = {...settings, frame, seconds, progress: settings.durationFrames === 1 ? 1 : frame / (settings.durationFrames - 1), random: Math.random};
         await shot.renderFrame(ctx);
         for (const animation of document.getAnimations()) {
           animation.pause();

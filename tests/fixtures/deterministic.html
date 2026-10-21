@@ -1,0 +1,6 @@
+<!doctype html><html><script src="../../projects/demo/runtime.js"></script><script>
+framecraft.shot({async renderFrame(ctx) {
+  const timestamp = await new Promise(resolve => requestAnimationFrame(resolve));
+  document.body.textContent = JSON.stringify({date: Date.now(), performance: performance.now(), timestamp, random: Math.random(), contextRandom: ctx.random(), progress: ctx.progress});
+}});
+</script></html>
