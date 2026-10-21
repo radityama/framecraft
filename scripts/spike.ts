@@ -20,7 +20,7 @@ async function main() {
   if (command === 'still' && frame === undefined) throw new Error('still requires --frame');
   const root = resolve(import.meta.dir, '../projects/demo');
   const project = await loadProject(root);
-  const shot = shotId && project.shots.find(s => s.id === shotId);
+  const shot = shotId === undefined ? undefined : project.shots.find(s => s.id === shotId);
   if (shotId && !shot) throw new Error(`Unknown shot: ${shotId}`);
   const duration = shot?.durationFrames ?? project.durationFrames;
   if (frame !== undefined && (!Number.isSafeInteger(frame) || frame >= duration)) throw new Error(`Frame must be between 0 and ${duration - 1}`);
