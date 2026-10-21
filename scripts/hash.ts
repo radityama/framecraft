@@ -3,7 +3,7 @@ import {openBrowser, renderStill, selectComposition} from '@remotion/renderer';
 import {VERSION} from 'remotion/version';
 import {createHash} from 'node:crypto';
 import {mkdtemp, mkdir, readFile, rename, rm, writeFile} from 'node:fs/promises';
-import {arch, platform, release} from 'node:os';
+import {arch, platform, release, tmpdir} from 'node:os';
 import {join, resolve} from 'node:path';
 import {loadProject} from '../src/spike/project';
 
@@ -26,11 +26,12 @@ async function main() {
   const chromium = Buffer.from(version.stdout).toString().trim();
   await mkdir(output, {recursive: true});
   const temporary = await mkdtemp(join(output, '.hash-'));
+  const bundleDir = await mkdtemp(join(tmpdir(), 'framecraft-bundle-'));
   const reportPath = join(output, 'hashes.json');
   const partial = `${reportPath}.partial-${process.pid}`;
   let browser;
   try {
-    const serveUrl = await bundle({entryPoint: resolve(import.meta.dir, '../src/spike/index.tsx'), publicDir: root});
+    const serveUrl = await bundle({entryPoint: resolve(import.meta.dir, '../src/spike/index.tsx'), publicDir: root, outDir: bundleDir});
     browser = await openBrowser('chrome', {browserExecutable});
     const errors: string[] = [];
     const onBrowserLog = (log: {type: string; text: string}) => { if (log.type === 'error') errors.push(log.text); };
@@ -50,10 +51,12 @@ async function main() {
   } finally {
     try { await browser?.close({silent: true}); }
     finally {
-      await rm(temporary, {recursive: true, force: true});
-      await rm(partial, {force: true});
+      try {
+        await rm(temporary, {recursive: true, force: true});
+        await rm(partial, {force: true});
+      } finally { await rm(bundleDir, {recursive: true, force: true}); }
     }
   }
 }
 
-main().catch(error => { console.error(error); process.exitCode = 1; });
+main().catch(error => { console.error(error); process.exit(1); });

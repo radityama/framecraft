@@ -1,5 +1,6 @@
 import {afterEach, expect, test} from 'bun:test';
 import {mkdtemp, mkdir, writeFile, symlink, rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {loadProject} from '../src/spike/project';
 
@@ -9,7 +10,7 @@ afterEach(async () => {
 });
 
 async function fixture() {
-  const root = await mkdtemp('/tmp/opencode/framecraft-test-');
+  const root = await mkdtemp(join(tmpdir(), 'framecraft-test-'));
   roots.push(root);
   await mkdir(join(root, 'scenes/intro/shots'), {recursive: true});
   const project = {schemaVersion: 1, id: 'demo', title: 'Renderer trial', video: {width: 1920, height: 1080, fps: 30, background: '#101820'}, scenes: [{id: 'intro', path: 'scenes/intro/scene.json'}], audio: []};
@@ -62,7 +63,7 @@ test('rejects traversal and symlink escapes', async () => {
   data.shots[1]!.entry = '../../../../outside.html';
   await data.save();
   expect(loadProject(data.root)).rejects.toThrow('entry');
-  const outside = await mkdtemp('/tmp/opencode/framecraft-outside-');
+  const outside = await mkdtemp(join(tmpdir(), 'framecraft-outside-'));
   roots.push(outside);
   await writeFile(join(outside, 'outside.html'), '<!doctype html>');
   await symlink(join(outside, 'outside.html'), join(data.root, 'scenes/intro/shots/link.html'));

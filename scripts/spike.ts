@@ -1,6 +1,7 @@
 import {bundle} from '@remotion/bundler';
 import {renderMedia, renderStill, selectComposition} from '@remotion/renderer';
-import {mkdir, rename, rm, stat} from 'node:fs/promises';
+import {mkdir, mkdtemp, rename, rm, stat} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
 import {resolve, join, extname} from 'node:path';
 import {loadProject} from '../src/spike/project';
 
@@ -27,14 +28,15 @@ async function main() {
   const output = join(resolve(import.meta.dir, '../output'), command === 'still' ? `snaps/${id}-${frame}.png` : `${id}.mp4`);
   const temporary = `${output}.partial-${process.pid}${extname(output)}`;
   const start = performance.now();
-  const serveUrl = await bundle({entryPoint: resolve(import.meta.dir, '../src/spike/index.tsx'), publicDir: root});
-  const errors: string[] = [];
-  const onBrowserLog = (log: {type: string; text: string}) => { if (log.type === 'error') errors.push(log.text); };
-  const browserExecutable = process.env.CHROME_BIN || undefined;
-  const composition = await selectComposition({serveUrl, id, browserExecutable, onBrowserLog});
-  if (composition.durationInFrames !== duration || composition.width !== project.video.width || composition.height !== project.video.height || composition.fps !== project.video.fps) throw new Error(`Composition ${id} differs from validated manifest`);
-  await mkdir(resolve(output, '..'), {recursive: true});
+  const bundleDir = await mkdtemp(join(tmpdir(), 'framecraft-bundle-'));
   try {
+    const serveUrl = await bundle({entryPoint: resolve(import.meta.dir, '../src/spike/index.tsx'), publicDir: root, outDir: bundleDir});
+    const errors: string[] = [];
+    const onBrowserLog = (log: {type: string; text: string}) => { if (log.type === 'error') errors.push(log.text); };
+    const browserExecutable = process.env.CHROME_BIN || undefined;
+    const composition = await selectComposition({serveUrl, id, browserExecutable, onBrowserLog});
+    if (composition.durationInFrames !== duration || composition.width !== project.video.width || composition.height !== project.video.height || composition.fps !== project.video.fps) throw new Error(`Composition ${id} differs from validated manifest`);
+    await mkdir(resolve(output, '..'), {recursive: true});
     if (command === 'still') await renderStill({serveUrl, composition, frame: frame!, output: temporary, imageFormat: 'png', browserExecutable, onBrowserLog});
     else await renderMedia({serveUrl, composition, codec: 'h264', pixelFormat: 'yuv420p', outputLocation: temporary, browserExecutable, onBrowserLog, concurrency: 2});
     if (errors.length) throw new Error(`Browser console errors:\n${errors.join('\n')}`);
@@ -42,10 +44,10 @@ async function main() {
     await rename(temporary, output);
     console.log(`${id} ${command}: ${duration} frames at ${composition.width}x${composition.height}/${composition.fps}fps, ${size} bytes, ${((performance.now() - start) / 1000).toFixed(2)}s`);
     console.log(output);
-  } catch (error) {
-    await rm(temporary, {force: true});
-    throw error;
+  } finally {
+    try { await rm(temporary, {force: true}); }
+    finally { await rm(bundleDir, {recursive: true, force: true}); }
   }
 }
 
-main().catch(error => { console.error(error); process.exitCode = 1; });
+main().catch(error => { console.error(error); process.exit(1); });

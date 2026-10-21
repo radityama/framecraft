@@ -1,5 +1,6 @@
 import {afterEach, expect, test} from 'bun:test';
 import {mkdtemp, mkdir, rm, writeFile} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
 import {join, resolve} from 'node:path';
 
 const repo = resolve(import.meta.dir, '..');
@@ -12,7 +13,7 @@ function validate(...args: string[]) {
 }
 
 test('validate reports durations and nonfatal warnings for risky shot source', async () => {
-  const root = await mkdtemp('/tmp/opencode/framecraft-validate-');
+  const root = await mkdtemp(join(tmpdir(), 'framecraft-validate-'));
   roots.push(root);
   await mkdir(join(root, 'scenes/intro/shots'), {recursive: true});
   await writeFile(join(root, 'project.json'), JSON.stringify({schemaVersion: 1, id: 'fixture', video: {width: 1920, height: 1080, fps: 30}, scenes: [{id: 'intro', path: 'scenes/intro/scene.json'}], audio: []}));
