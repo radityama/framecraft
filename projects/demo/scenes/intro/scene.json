@@ -4,7 +4,8 @@
   "shots": [
     {"id": "title", "entry": "shots/01-title/index.html", "durationFrames": 60, "overlapFrames": 0},
     {"id": "diagram", "entry": "shots/02-diagram/index.html", "durationFrames": 90, "overlapFrames": 0},
-    {"id": "close", "entry": "shots/03-close/index.html", "durationFrames": 60, "overlapFrames": 0}
+    {"id": "close", "entry": "shots/03-close/index.html", "durationFrames": 60, "overlapFrames": 0},
+    {"id": "commit", "entry": "shots/04-commit/index.html", "durationFrames": 120, "overlapFrames": 0}
   ],
   "audio": []
 }
