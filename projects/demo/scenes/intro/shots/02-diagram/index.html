@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><style>
+  html,body{margin:0;width:100%;height:100%;background:#101820;color:#f8f0df;font-family:Arial,sans-serif}
+  main{height:100%;display:grid;place-items:center}
+  .diagram{width:1100px;height:460px;position:relative;display:flex;align-items:center;justify-content:space-between}
+  .track{position:absolute;top:50%;left:170px;right:170px;height:4px;background:#e0a95f}
+  .pulse{position:absolute;top:50%;left:170px;width:42px;height:42px;border-radius:50%;background:#e0a95f;animation:travel 3s linear both;animation-play-state:paused}
+  @keyframes travel{from{translate:0 -50%}to{translate:730px -50%}}
+  .node{z-index:1;background:#f8f0df;color:#101820;width:310px;height:260px;display:grid;place-items:center;font-size:48px}
+</style><main><section class="diagram"><div class="track"></div><div class="pulse"></div><div class="node">HTML</div><div class="node" id="result">Frame</div></section></main>
+<script src="../../../../runtime.js"></script><script src="../../../../assets/vendor/gsap.min.js"></script><script>
+  const timeline = gsap.timeline({paused:true}).fromTo('#result',{scale:.6,opacity:.4},{scale:1,opacity:1,duration:3,ease:'none'});
+  framecraft.shot({timelines:[timeline],renderFrame({frame}) {
+    document.querySelector('#result').dataset.frame = String(frame);
+  }});
+</script></html>

@@ -1,0 +1,31 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><body><script>
+  window.mount = async (src, ctx) => {
+    const iframe = document.createElement('iframe');
+    iframe.width = ctx.width;
+    iframe.height = ctx.height;
+    document.body.replaceChildren(iframe);
+    let waiting;
+    const response = (expected, frame) => new Promise((resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error(`Timeout waiting for ${expected} ${frame ?? ''}`)), 3000);
+      waiting = ({source, origin, data}) => {
+        if (source !== iframe.contentWindow || origin !== location.origin || data?.v !== 1) return;
+        if (data.type === 'error' || (data.type === expected && (frame === undefined || frame === data.frame))) {
+          clearTimeout(timer);
+          removeEventListener('message', waiting);
+          data.type === 'error' ? reject(new Error(data.message)) : resolve(data);
+        }
+      };
+      addEventListener('message', waiting);
+    });
+    const ready = response('ready');
+    iframe.src = src;
+    await new Promise(resolve => iframe.addEventListener('load', resolve, {once:true}));
+    iframe.contentWindow.postMessage({v:1,type:'init',ctx}, location.origin);
+    await ready;
+    window.seek = async frame => {
+      const result = response('rendered', frame);
+      iframe.contentWindow.postMessage({v:1,type:'seek',frame}, location.origin);
+      return result;
+    };
+  };
+</script></body></html>

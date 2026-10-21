@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "id": "demo",
+  "title": "Renderer trial",
+  "video": {"width": 1920, "height": 1080, "fps": 30, "background": "#101820"},
+  "scenes": [{"id": "intro", "path": "scenes/intro/scene.json"}],
+  "audio": []
+}

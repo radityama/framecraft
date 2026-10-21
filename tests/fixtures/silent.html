@@ -1,0 +1,5 @@
+<!doctype html><html><script>
+addEventListener('message', ({source,origin,data}) => {
+  if (data?.type === 'init') parent.postMessage({v:1,type:'ready'},location.origin);
+});
+</script></html>

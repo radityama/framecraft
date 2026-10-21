@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><style>
+  html,body{margin:0;width:100%;height:100%;background:#101820;color:#f8f0df;font-family:Georgia,serif}
+  main{height:100%;display:flex;align-items:center;justify-content:center}
+  h1{font-size:154px;font-weight:400;letter-spacing:-.055em;margin:0;transform-origin:left center}
+</style><main><h1>Framecraft</h1></main>
+<script src="../../../../runtime.js"></script><script>
+  const title = document.querySelector('h1');
+  framecraft.shot({renderFrame({progress}) {
+    title.style.opacity = String(Math.min(1, progress * 3));
+    title.style.transform = `scale(${0.8 + 0.2 * Math.min(1, progress * 3)})`;
+  }});
+</script></html>
