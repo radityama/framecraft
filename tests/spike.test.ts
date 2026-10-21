@@ -6,12 +6,20 @@ const root = resolve(import.meta.dir, '..');
 let browser: Browser;
 let server: ReturnType<typeof Bun.serve>;
 let page: Page;
+let fontRequested: () => void;
+let fontRequest: Promise<void> | undefined;
+let releaseFont: (() => void) | undefined;
 
 beforeAll(async () => {
   const executablePath = process.env.CHROME_BIN || resolve(root, 'node_modules/.remotion/chrome-headless-shell/linux64/chrome-headless-shell-linux64/chrome-headless-shell');
   browser = await chromium.launch({executablePath, headless: true});
-  server = Bun.serve({port: 0, hostname: '127.0.0.1', fetch(request) {
+  server = Bun.serve({port: 0, hostname: '127.0.0.1', async fetch(request) {
     const pathname = decodeURIComponent(new URL(request.url).pathname);
+    if (pathname === '/tests/fixtures/late-font.woff2') {
+      fontRequested?.();
+      await fontRequest;
+      return new Response(Bun.file(resolve(root, 'projects/demo/assets/fonts/ibm-plex-serif-latin-400.woff2')), {headers: {'Content-Type': 'font/woff2'}});
+    }
     const file = resolve(root, `.${pathname}`);
     const rel = relative(root, file);
     if (rel.startsWith(`..${sep}`) || rel === '..') return new Response('Forbidden', {status: 403});
@@ -109,4 +117,28 @@ test('render acknowledgement waits for fonts, image decode and two native animat
   await page.evaluate(() => (window as any).pending);
   expect(await completed()).toBe(true);
   await expect(page.evaluate(() => (window as any).seek(2))).rejects.toThrow('Injected decode failure');
+});
+
+test('first frame waits for a real, late local font before acknowledging', async () => {
+  const requested = new Promise<void>(resolve => { fontRequested = resolve; });
+  fontRequest = new Promise<void>(resolve => { releaseFont = resolve; });
+  try {
+    await page.evaluate(() => (window as any).mount('/tests/fixtures/late-font.html', {id:'late',fps:30,durationFrames:3,width:1920,height:1080}));
+    await page.evaluate(() => {
+      (window as any).completed = false;
+      (window as any).pending = (window as any).seek(0).then(() => { (window as any).completed = true; });
+    });
+    await requested;
+    await page.frameLocator('iframe').locator('body').evaluate(() => (window as any).afterTwoFrames);
+    expect(await page.evaluate(() => (window as any).completed)).toBe(false);
+    releaseFont?.();
+    await page.evaluate(() => (window as any).pending);
+    const first = await page.locator('iframe').screenshot();
+    expect(await page.frameLocator('iframe').locator('body').evaluate(() => ({
+      check: document.fonts.check('400 80px "Delayed Plex"', 'Framecraft'),
+      status: Array.from(document.fonts).find(font => font.family === 'Delayed Plex')?.status,
+    }))).toEqual({check: true, status: 'loaded'});
+    await page.evaluate(() => (window as any).seek(0));
+    expect((await page.locator('iframe').screenshot()).equals(first)).toBe(true);
+  } finally { releaseFont?.(); fontRequest = undefined; }
 });

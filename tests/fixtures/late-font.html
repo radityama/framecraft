@@ -1,0 +1,14 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><style>
+  @font-face { font-family: "Delayed Plex"; src: url("late-font.woff2") format("woff2"); font-weight: 400; }
+  body { margin: 0; background: #101820; color: #f8f0df; }
+  #late { font: 80px "Delayed Plex", serif; }
+</style><body><div id="late"></div><script src="../../projects/demo/runtime.js"></script><script>
+framecraft.shot({renderFrame({frame}) {
+  const late = document.querySelector('#late');
+  requestAnimationFrame(() => {
+    late.textContent = 'Framecraft';
+    late.dataset.frame = String(frame);
+  });
+  window.afterTwoFrames = new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+}});
+</script></body></html>

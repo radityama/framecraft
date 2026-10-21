@@ -48,10 +48,12 @@
           animation.currentTime = seconds * 1000;
         }
         for (const timeline of [...timelines, ...(shot.timelines || [])]) timeline.time(seconds, false);
+        document.body.offsetHeight;
         await document.fonts.ready;
         await Promise.all(Array.from(document.images, image => image.decode()));
         await new Promise(resolve => requestFrame(resolve));
         await new Promise(resolve => requestFrame(resolve));
+        if (document.fonts.status !== 'loaded') await document.fonts.ready;
         send('rendered', {frame});
       } catch (error) { failure(error); }
     }
