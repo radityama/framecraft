@@ -1,3 +1,4 @@
+import React from 'react';
 import {Composition, registerRoot} from 'remotion';
 import project from '../../projects/demo/project.json';
 import scene from '../../projects/demo/scenes/intro/scene.json';

@@ -1,3 +1,4 @@
+import React from 'react';
 import {Sequence} from 'remotion';
 import type {Project, Shot} from './project';
 import {ShotView} from './shot';
