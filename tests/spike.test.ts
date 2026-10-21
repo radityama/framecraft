@@ -86,3 +86,27 @@ test('registered and legacy timelines seek to the same local time', async () => 
   expect(await read(10)).toEqual({registered: String(10 / 30), legacy: String(10 / 30)});
   expect(await read(70)).toEqual({registered: String(70 / 30), legacy: String(70 / 30)});
 });
+
+test('render acknowledgement waits for fonts, image decode and two native animation frames', async () => {
+  await page.evaluate(() => (window as any).mount('/tests/fixtures/settling.html', {id:'settling',fps:30,durationFrames:3,width:1920,height:1080}));
+  await page.evaluate(() => {
+    (window as any).completed = false;
+    (window as any).pending = (window as any).seek(0).then(() => {(window as any).completed = true;});
+  });
+  const child = page.frameLocator('iframe');
+  const completed = () => page.evaluate(() => (window as any).completed);
+  await child.locator('body[data-frame="0"]').waitFor();
+  expect(await completed()).toBe(false);
+  await child.locator('body').evaluate(() => (window as any).releaseFonts());
+  expect(await completed()).toBe(false);
+  await child.locator('body').evaluate(() => (window as any).releaseImage());
+  await page.waitForFunction(() => (document.querySelector('iframe')?.contentWindow as any)?.queuedFrames() === 1);
+  expect(await completed()).toBe(false);
+  await child.locator('body').evaluate(() => (window as any).stepFrame());
+  await page.waitForFunction(() => (document.querySelector('iframe')?.contentWindow as any)?.queuedFrames() === 1);
+  expect(await completed()).toBe(false);
+  await child.locator('body').evaluate(() => (window as any).stepFrame());
+  await page.evaluate(() => (window as any).pending);
+  expect(await completed()).toBe(true);
+  await expect(page.evaluate(() => (window as any).seek(2))).rejects.toThrow('Injected decode failure');
+});

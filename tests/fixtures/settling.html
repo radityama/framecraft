@@ -1,0 +1,18 @@
+<!doctype html><html><body><img alt="fixture"><script>
+const queued = [];
+window.requestAnimationFrame = callback => { queued.push(callback); return queued.length; };
+window.stepFrame = () => queued.splice(0).forEach(callback => callback(123));
+window.queuedFrames = () => queued.length;
+</script><script src="../../projects/demo/runtime.js"></script><script>
+let releaseFonts, releaseImage;
+const fonts = new Promise(resolve => { releaseFonts = resolve; });
+const image = new Promise(resolve => { releaseImage = resolve; });
+Object.defineProperty(document.fonts, 'ready', {get: () => fonts});
+document.querySelector('img').decode = () => image;
+framecraft.shot({renderFrame({frame}) {
+  document.body.dataset.frame = String(frame);
+  if (frame === 2) document.querySelector('img').decode = () => Promise.reject(new Error('Injected decode failure'));
+}});
+window.releaseFonts = releaseFonts;
+window.releaseImage = releaseImage;
+</script></body></html>
