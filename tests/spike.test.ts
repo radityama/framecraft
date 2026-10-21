@@ -142,3 +142,24 @@ test('first frame waits for a real, late local font before acknowledging', async
     expect((await page.locator('iframe').screenshot()).equals(first)).toBe(true);
   } finally { releaseFont?.(); fontRequest = undefined; }
 });
+
+test('overlapping seeks apply only the last frame and never acknowledge a stale seek', async () => {
+  await page.evaluate(() => (window as any).mount('/tests/fixtures/overlap.html', {id:'overlap',fps:30,durationFrames:3,width:1920,height:1080}));
+  await page.evaluate(() => {
+    (window as any).seekEvents = [];
+    addEventListener('message', ({source, origin, data}) => {
+      if (source === document.querySelector('iframe')?.contentWindow && origin === location.origin && data?.v === 1 && ['rendered', 'error'].includes(data.type)) (window as any).seekEvents.push(data);
+    });
+    document.querySelector('iframe')!.contentWindow!.postMessage({v: 1, type: 'seek', frame: 1}, location.origin);
+  });
+  const child = page.frameLocator('iframe');
+  await child.locator('body[data-waiting="true"]').waitFor({state: 'attached'});
+  await page.evaluate(() => document.querySelector('iframe')!.contentWindow!.postMessage({v: 1, type: 'seek', frame: 2}, location.origin));
+  await child.locator('body').evaluate(() => (window as any).releaseFirst());
+  await child.locator('body').evaluate(() => (window as any).firstFinished);
+  await page.waitForFunction(() => (window as any).seekEvents.some(({frame}: {frame: number}) => frame === 2));
+  await child.locator('body').evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  expect(await page.evaluate(() => (window as any).seekEvents.map(({type, frame}: {type: string; frame: number}) => ({type, frame})))).toEqual([{type: 'rendered', frame: 2}]);
+  expect(await child.locator('body').getAttribute('data-frame')).toBe('2');
+  expect(await child.locator('body').innerText()).toBe('2');
+});

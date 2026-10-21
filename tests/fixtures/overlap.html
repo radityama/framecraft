@@ -1,0 +1,21 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><body><img hidden alt=""><span id="frame"></span><script src="../../projects/demo/runtime.js"></script><script>
+let releaseFirst;
+const first = new Promise(resolve => { releaseFirst = resolve; });
+let finishFirst;
+window.firstFinished = new Promise(resolve => { finishFirst = resolve; });
+window.releaseFirst = () => releaseFirst();
+document.querySelector('img').decode = () => {
+  if (document.body.dataset.frame === '1') {
+    document.body.dataset.waiting = 'true';
+    return first.then(() => {
+      document.querySelector('#frame').textContent = '1';
+      finishFirst();
+    });
+  }
+  return Promise.resolve();
+};
+framecraft.shot({renderFrame({frame}) {
+  document.body.dataset.frame = String(frame);
+  document.querySelector('#frame').textContent = String(frame);
+}});
+</script></body></html>
