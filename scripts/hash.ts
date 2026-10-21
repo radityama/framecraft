@@ -7,7 +7,21 @@ import {arch, platform, release, tmpdir} from 'node:os';
 import {join, resolve} from 'node:path';
 import {loadProject} from '../src/spike/project';
 
-const frames: [string, number][] = [['title', 0], ['title', 30], ['diagram', 0], ['diagram', 30], ['diagram', 70], ['close', 59]];
+const frames: [string, number][] = [['title', 0], ['title', 30], ['title', 59], ['diagram', 0], ['diagram', 30], ['diagram', 70], ['close', 0], ['close', 59], ['commit', 0], ['commit', 30], ['commit', 75], ['commit', 119]];
+
+function installedFonts() {
+  try {
+    const result = Bun.spawnSync(['fc-list', '-f', '%{family}|%{file}\n']);
+    if (result.exitCode !== 0) return null;
+    const requested = ['IBM Plex Serif', 'IBM Plex Sans', 'JetBrains Mono'];
+    return Buffer.from(result.stdout).toString().split('\n').flatMap(line => {
+      const split = line.indexOf('|');
+      if (split < 0) return [];
+      const family = line.slice(0, split);
+      return family.split(',').some(name => requested.includes(name.trim())) ? [{family, file: line.slice(split + 1)}] : [];
+    }).sort((a, b) => a.family.localeCompare(b.family) || a.file.localeCompare(b.file));
+  } catch { return null; }
+}
 
 async function main() {
   const root = resolve(import.meta.dir, '../projects/demo');
@@ -45,7 +59,7 @@ async function main() {
       if (errors.length) throw new Error(`Browser console errors:\n${errors.join('\n')}`);
       hashes[`${id}:${frame}`] = createHash('sha256').update(await readFile(png)).digest('hex');
     }
-    await writeFile(partial, JSON.stringify({environment: {bun: Bun.version, remotion: VERSION, chromium, os: {platform: platform(), release: release(), arch: arch()}}, frames: hashes}, null, 2) + '\n');
+    await writeFile(partial, JSON.stringify({environment: {bun: Bun.version, remotion: VERSION, chromium, os: {platform: platform(), release: release(), arch: arch()}, fonts: installedFonts()}, frames: hashes}, null, 2) + '\n');
     await rename(partial, reportPath);
     console.log(reportPath);
   } finally {
