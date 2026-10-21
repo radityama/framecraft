@@ -2,7 +2,7 @@ import {afterEach, expect, test} from 'bun:test';
 import {mkdtemp, mkdir, writeFile, symlink, rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
-import {loadProject} from '../src/spike/project';
+import {loadProject, loadStudioProject} from '../src/spike/project';
 
 const roots: string[] = [];
 afterEach(async () => {
@@ -34,6 +34,71 @@ test('loads independent shots and computes hard-cut offsets', async () => {
   expect(result.shots.map(({startFrame}) => startFrame)).toEqual([0, 60, 150]);
   expect(result.durationFrames).toBe(210);
   expect(result.shots[1].entry).toBe('scenes/intro/shots/diagram.html');
+});
+
+test('loads validated scenes in order without changing the single-scene export guard', async () => {
+  const data = await fixture();
+  data.project.scenes.push({id: 'second', path: 'scenes/second/scene.json'});
+  await mkdir(join(data.root, 'scenes/second/shots'), {recursive: true});
+  await writeFile(join(data.root, 'scenes/second/shots/next.html'), '<!doctype html>');
+  await writeFile(join(data.root, 'scenes/second/scene.json'), JSON.stringify({id: 'second', title: 'Second', shots: [{id: 'next', entry: 'shots/next.html', durationFrames: 30, overlapFrames: 0}], audio: []}));
+  await data.save();
+  const studio = await loadStudioProject(data.root);
+  expect(studio).toEqual({
+    id: 'demo', title: 'Renderer trial', video: {width: 1920, height: 1080, fps: 30},
+    scenes: [
+      {id: 'intro', title: 'Renderer trial', shots: [
+        {id: 'title', entry: 'scenes/intro/shots/title.html', durationFrames: 60, startFrame: 0},
+        {id: 'diagram', entry: 'scenes/intro/shots/diagram.html', durationFrames: 90, startFrame: 60},
+        {id: 'close', entry: 'scenes/intro/shots/close.html', durationFrames: 60, startFrame: 150},
+      ], durationFrames: 210},
+      {id: 'second', title: 'Second', shots: [{id: 'next', entry: 'scenes/second/shots/next.html', durationFrames: 30, startFrame: 0}], durationFrames: 30},
+    ],
+  });
+  expect(loadProject(data.root)).rejects.toThrow('exactly one scene');
+});
+
+test('allows an empty Studio project but not an empty export project', async () => {
+  const data = await fixture();
+  data.project.scenes.length = 0;
+  await data.save();
+  expect(await loadStudioProject(data.root)).toEqual({id: 'demo', title: 'Renderer trial', video: {width: 1920, height: 1080, fps: 30}, scenes: []});
+  expect(loadProject(data.root)).rejects.toThrow('exactly one scene');
+});
+
+test('rejects duplicate scene references and invalid scene paths', async () => {
+  const data = await fixture();
+  data.project.scenes.push({id: 'intro', path: 'scenes/intro/scene.json'});
+  await data.save();
+  expect(loadStudioProject(data.root)).rejects.toThrow('duplicate scene id');
+  data.project.scenes[1] = {id: 'second', path: '../outside.json'};
+  await data.save();
+  expect(loadStudioProject(data.root)).rejects.toThrow('path escapes project');
+});
+
+test('validates each referenced scene and rejects symlinks outside the project', async () => {
+  const data = await fixture();
+  data.project.scenes.push({id: 'second', path: 'scenes/second/scene.json'});
+  await mkdir(join(data.root, 'scenes/second/shots'), {recursive: true});
+  await writeFile(join(data.root, 'scenes/second/scene.json'), JSON.stringify({id: 'second', shots: [{id: 'next', entry: 'shots/missing.html', durationFrames: 30, overlapFrames: 0}], audio: []}));
+  await data.save();
+  expect(loadStudioProject(data.root)).rejects.toThrow('missing.html');
+  const outside = await mkdtemp(join(tmpdir(), 'framecraft-outside-'));
+  roots.push(outside);
+  await writeFile(join(outside, 'next.html'), '<!doctype html>');
+  await symlink(join(outside, 'next.html'), join(data.root, 'scenes/second/shots/next.html'));
+  await writeFile(join(data.root, 'scenes/second/scene.json'), JSON.stringify({id: 'second', shots: [{id: 'next', entry: 'shots/next.html', durationFrames: 30, overlapFrames: 0}], audio: []}));
+  expect(loadStudioProject(data.root)).rejects.toThrow('entry');
+});
+
+test('falls back to validated ids for missing titles and rejects empty-shot scenes', async () => {
+  const data = await fixture();
+  await writeFile(join(data.root, 'project.json'), JSON.stringify({...data.project, title: undefined}));
+  await writeFile(join(data.root, 'scenes/intro/scene.json'), JSON.stringify({id: 'intro', shots: data.shots, audio: []}));
+  expect((await loadStudioProject(data.root)).title).toBe('demo');
+  expect((await loadStudioProject(data.root)).scenes[0]?.title).toBe('intro');
+  await writeFile(join(data.root, 'scenes/intro/scene.json'), JSON.stringify({id: 'intro', shots: [], audio: []}));
+  expect(loadStudioProject(data.root)).rejects.toThrow('scene.shots must be nonempty');
 });
 
 test('rejects duplicate IDs and invalid durations', async () => {
