@@ -1,7 +1,6 @@
+import React from 'react';
 import {createRoot} from 'react-dom/client';
+import {Studio} from './Studio';
+import './studio.css';
 
-function App() {
-  return <main>Loading project…</main>;
-}
-
-createRoot(document.getElementById('video-container')!).render(<App />);
+createRoot(document.getElementById('video-container')!).render(<Studio />);
