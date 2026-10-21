@@ -101,9 +101,8 @@ export function Studio() {
     if (!instance || !scene) return;
     const onFrame = ({detail}: {detail: {frame: number}}) => setFrame(detail.frame);
     const onPlay = () => {
-      pending.current = null;
       setPlaying(true);
-      setStatus('ready');
+      if (pending.current === null) setStatus('ready');
     };
     const onPause = () => setPlaying(false);
     const onEnded = () => {
@@ -213,9 +212,9 @@ export function Studio() {
     <header className="topbar">
       <div className="identity">
         <h1>Framecraft</h1>
-        <p><span>{project.title}</span> <span className="muted">{project.id}</span></p>
+        <p>{project.title}</p>
       </div>
-      <p className="format">{project.video.width}×{project.video.height} · {project.video.fps} fps</p>
+      <p className="format">{project.id} · {project.video.width}×{project.video.height} · {project.video.fps} fps</p>
       <label className="scene-picker">Scene
         <select value={sceneId} onChange={event => {
           const next = project.scenes.find(candidate => candidate.id === event.currentTarget.value);
@@ -269,17 +268,19 @@ export function Studio() {
 
           <div className="timeline">
             <h2 className="sr-only">Timeline</h2>
-            <div className="segments" aria-hidden="true">
-              {scene.shots.map(shot => <span key={shot.id} data-active={shot.id === active?.id} style={{flexGrow: shot.durationFrames}} />)}
+            <div className="track">
+              <div className="segments" aria-hidden="true">
+                {scene.shots.map(shot => <span key={shot.id} data-active={shot.id === active?.id} style={{flexGrow: shot.durationFrames}} />)}
+              </div>
+              <input type="range" aria-label="Timeline frame" min={0} max={scene.durationFrames - 1} step={1} value={frame}
+                onChange={event => seek(Number(event.currentTarget.value))} />
             </div>
-            <input type="range" aria-label="Timeline frame" min={0} max={scene.durationFrames - 1} step={1} value={frame}
-              onChange={event => seek(Number(event.currentTarget.value))} />
             <p className="frame-count">Frame {frame} of {scene.durationFrames - 1}</p>
           </div>
         </section>
 
         <aside className="shots" aria-label="Shots">
-          <h2>Shots</h2>
+          <h2>Shots <span className="muted">{scene.shots.length} · {scene.durationFrames}f</span></h2>
           <ol>
             {scene.shots.map(shot => <li key={shot.id}>
               <button type="button" data-active={shot.id === active?.id} aria-current={shot.id === active?.id ? 'true' : undefined}
