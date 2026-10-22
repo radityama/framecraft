@@ -2,6 +2,7 @@ import {expect, test} from 'bun:test';
 import {copyFile, mkdir, mkdtemp, rm, symlink, writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join, resolve} from 'node:path';
+import {RenderInternals} from '@remotion/renderer';
 import {loadProject, loadStudioProject} from '../src/spike/project';
 import {probeAudioFrames} from '../src/spike/audio-assets';
 
@@ -78,6 +79,42 @@ test('rejects traversal, symlink escapes, unsupported media and invalid codec', 
     await expect(probeAudioFrames(join(assets, 'bed.wav'), 30)).resolves.toBe(330);
     await expect(probeAudioFrames(join(assets, 'hit-a.mp3'), 30)).resolves.toBeGreaterThanOrEqual(20);
   } finally { await rm(data.root, {recursive: true, force: true}); await rm(outside, {recursive: true, force: true}); }
+});
+
+test('accepts an MP3 with embedded cover art', async () => {
+  const data = await fixture();
+  try {
+    const cover = resolve(import.meta.dir, '../docs/screenshots/studio-phone.png');
+    const mp3 = join(data.root, 'assets/audio/covered.mp3');
+    const binary = RenderInternals.getExecutablePath({type: 'ffmpeg', indent: false, logLevel: 'error', binariesDirectory: null});
+    const process = Bun.spawn([binary, '-v', 'error', '-i', join(assets, 'hit-a.mp3'), '-i', cover,
+      '-map', '0:a', '-map', '1:v', '-c:a', 'copy', '-c:v', 'png', '-disposition:v', 'attached_pic', '-y', mp3], {stderr: 'pipe'});
+    const [error, exit] = await Promise.all([new Response(process.stderr).text(), process.exited]);
+    expect(error).toBe('');
+    expect(exit).toBe(0);
+    await expect(probeAudioFrames(mp3, 30)).resolves.toBeGreaterThanOrEqual(20);
+    data.scene.audio.cues[1]!.src = 'assets/audio/covered.mp3';
+    await data.save();
+    expect((await loadProject(data.root)).audio[1]?.src).toBe('assets/audio/covered.mp3');
+  } finally { await rm(data.root, {recursive: true, force: true}); }
+});
+
+test('audio asset errors identify the scene when cue ids are reused', async () => {
+  const data = await fixture();
+  try {
+    await mkdir(join(data.root, 'scenes/second/shots'), {recursive: true});
+    await writeFile(join(data.root, 'scenes/second/shots/a.html'), '<!doctype html>');
+    await writeFile(join(data.root, 'scenes/second/scene.json'), JSON.stringify({id: 'second', shots: [
+      {id: 'a', entry: 'shots/a.html', durationFrames: 330, overlapFrames: 0},
+    ], audio: {schemaVersion: 1, cues: [{...bed, src: 'assets/audio/missing.wav'}]}}));
+    data.project.scenes.push({id: 'second', path: 'scenes/second/scene.json'});
+    await data.save();
+    await expect(loadStudioProject(data.root)).rejects.toThrow(/scene second.*audio cue bed.*missing\.wav/);
+    await writeFile(join(data.root, 'scenes/second/scene.json'), JSON.stringify({id: 'second', shots: [
+      {id: 'a', entry: 'shots/a.html', durationFrames: 330, overlapFrames: 0},
+    ], audio: {schemaVersion: 1, cues: [{...bed, trimOutFrames: 331}]}}));
+    await expect(loadStudioProject(data.root)).rejects.toThrow(/scene second.*audio cue bed.*331.*330/);
+  } finally { await rm(data.root, {recursive: true, force: true}); }
 });
 
 test('legacy empty audio stays silent and shot cues require a versioned scene timeline', async () => {

@@ -96,11 +96,11 @@ async function loadValidatedProject(root: string, singleScene: boolean): Promise
         try {
           canonical = await entry(base, cue.src, `audio cue ${cue.id}.src`);
           frames = await probeAudioFrames(join(base, canonical), resultVideo.fps);
-        } catch (error) { throw new Error(`audio cue ${cue.id}: ${String(error)}`); }
+        } catch (error) { throw new Error(`scene ${sceneId}, audio cue ${cue.id}: ${String(error)}`); }
         source = {src: canonical, frames};
         media.set(cue.src, source);
       }
-      if (cue.trimOutFrames > source.frames) throw new Error(`audio cue ${cue.id}: trimOutFrames ${cue.trimOutFrames} exceeds ${source.frames} source frames in ${cue.src}`);
+      if (cue.trimOutFrames > source.frames) throw new Error(`scene ${sceneId}, audio cue ${cue.id}: trimOutFrames ${cue.trimOutFrames} exceeds ${source.frames} source frames in ${cue.src}`);
       cue.src = source.src;
     }
     for (const shot of shots) shot.audio = resolved.shotCues[shot.id]!;
