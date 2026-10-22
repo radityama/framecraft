@@ -1,6 +1,6 @@
 # Phase 2: Frame-Based Audio Design
 
-**Date:** 2026-10-22. **Status:** Approved design, pending written-spec review.
+**Date:** 2026-10-22. **Status:** Written spec reviewed and approved.
 
 ## Goal and scope
 
