@@ -3,7 +3,7 @@ import {createHash} from 'node:crypto';
 import {mkdtemp, mkdir, readFile, readdir, rm, symlink, writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
-import {sourceDigest, summaryText, verifyReview, type ReviewManifest} from '../src/review/artifacts';
+import {sourceDigest, summaryText, validatePng, verifyReview, type ReviewManifest} from '../src/review/artifacts';
 import {captureFrames} from '../src/review/capture';
 import {selectReviewFrames} from '../src/review/frames';
 
@@ -183,6 +183,14 @@ test('read-only check rejects a correctly hashed PNG signature without decodable
   data.manifest.captures[0] = {...data.frame, status: 'captured', sha256: hash(bad)};
   await data.save();
   await expect(verifyReview(join(data.output, 'manifest.json'), data.root)).rejects.toThrow('PNG');
+});
+
+test('PNG decoding uses the provided bytes, not the diagnostic filename', async () => {
+  const data = await fixture();
+  const absent = join(data.output, 'absent.png');
+  await validatePng(absent, png);
+  await expect(validatePng(join(data.output, data.frame.path),
+    Buffer.concat([png.subarray(0, 8), Buffer.from('X')]))).rejects.toThrow('PNG');
 });
 
 test('read-only check rejects contradictory status-specific capture fields', async () => {

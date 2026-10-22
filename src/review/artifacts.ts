@@ -27,10 +27,23 @@ export async function validatePng(path: string, bytes: Buffer): Promise<void> {
   if (bytes.length <= 8 || bytes.subarray(0, 8).toString('hex') !== pngHeader)
     throw new Error(`invalid PNG: ${path}`);
   const binary = RenderInternals.getExecutablePath({type: 'ffmpeg', indent: false, logLevel: 'error', binariesDirectory: null});
-  const proc = Bun.spawn([binary, '-v', 'error', '-xerror', '-f', 'image2pipe', '-c:v', 'png', '-i', path,
-    '-frames:v', '1', '-c:v', 'rawvideo', '-f', 'null', '-'], {stdout: 'ignore', stderr: 'pipe'});
-  const [error, exit] = await Promise.all([new Response(proc.stderr).text(), proc.exited]);
-  if (exit !== 0) throw new Error(`invalid PNG: ${path}: ${error.trim()}`);
+  const proc = Bun.spawn([binary, '-v', 'error', '-xerror', '-f', 'image2pipe', '-c:v', 'png', '-i', 'pipe:0',
+    '-frames:v', '1', '-c:v', 'rawvideo', '-f', 'null', '-'], {stdin: bytes, stdout: 'ignore', stderr: 'pipe'});
+  const errors = (async () => {
+    const reader = proc.stderr.getReader();
+    const output = Buffer.alloc(2048);
+    let size = 0;
+    while (true) {
+      const {done, value} = await reader.read();
+      if (done) break;
+      const length = Math.min(value.length, output.length - size);
+      output.set(value.subarray(0, length), size);
+      size += length;
+    }
+    return output.subarray(0, size).toString('utf8').trim();
+  })();
+  const [error, exit] = await Promise.all([errors, proc.exited]);
+  if (exit !== 0) throw new Error(`invalid PNG: ${path}: ${error}`);
 }
 
 function inside(base: string, target: string): boolean {
