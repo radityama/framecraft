@@ -11,25 +11,25 @@ Open the printed `http://127.0.0.1:3000/` URL. Set `PORT` to change the port (`P
 ## Controls
 
 - **Scene** selects a scene from `projects/demo/project.json`. The URL carries the choice as `?clip=<scene-id>`, so a reload or a shared link reopens the same scene. An unknown ID shows an error with buttons for the scenes that exist.
-- **Shots** lists the validated shots in order with their frame counts. Clicking one seeks to its first frame.
+- **Shots** lists the validated shots on the left in order with their frame counts. Clicking one seeks to its first frame. On tablets the list scrolls horizontally above the preview; on phones it uses two columns.
 - **Prev / Next** step exactly one frame and pause.
 - **Play / Pause** runs the Player's own clock. Playback stops on the last frame and does not loop; pressing Play there restarts from frame 0.
 - **Timeline** is a frame range from 0 to the last frame. The filled span marks the current shot; the line marks the playhead.
 - The timecode reads `mm:ss:ff` where the last pair is frames at the scene's fps. The frame counter shows `Frame N of last`.
 
-Keyboard: Tab moves through the scene picker, timeline, transport and shot buttons; Space or Enter activates the focused button. The timeline range responds to the arrow keys.
+Keyboard: Tab moves through the scene picker, shot buttons, transport and timeline. When focus is not on a control, Space plays or pauses and Left / Right steps one frame (pausing playback). Space or Enter activates a focused button; the focused timeline range responds to its own arrow keys. Shortcuts do not override focused form controls.
 
 ## Frame accuracy
 
 The Studio mounts the same `SceneComposition` as the Remotion export inside `@remotion/player`. Seeking is delegated to the deterministic shot runtime: `ShotView` posts a frame to the shot iframe, and the runtime settles fonts, images and animations before it acknowledges. Studio marks a requested frame ready only when the acknowledgement for that shot-local frame arrives from the mounted iframe, so a fast or reversed seek never leaves an older frame labelled as current. While a seek is pending, the preview shows a loading overlay rather than a stale frame.
 
-Playback advances through the Player's frame updates; the acknowledgement gate applies to manual seeks. Switching scenes unmounts the Player and its iframe, drops pending acknowledgements and resets frame, playback and error state. A shot that throws or fails to load shows the runtime's error message with a retry.
+Playback advances through the Player's frame updates; the acknowledgement gate applies to manual seeks and paused frames that have not settled yet. Switching scenes unmounts the Player and its iframe, drops pending acknowledgements and resets frame, playback and error state. A shot that throws, fails to load, or references an image that cannot decode shows an error with a retry.
 
 ## Interface notes
 
 The Studio is an app screen, not a marketing page: the preview is the focal point and the chrome stays quiet. It uses the already bundled IBM Plex Sans for interface text and JetBrains Mono only for the timecode and frame readouts, so the workspace and its output share one type system without remote assets. The fixed dark theme is deliberate for judging video colour.
 
-The `data-terminal` direction's accent is a single 1px selection line: active shot, active timeline span, and the Play control. Numbers and labels stay white or grey; no status is carried by colour alone. Design-taste's inspector passes at 1440, 768 and 390 with `font-not-dealt` allowed, because the project's local licensed fonts replace the dealt Public Sans by design. Two lint warnings remain and are intentional: zero-padded timecode is a clock, and the monospace is confined to that clock.
+The `data-terminal` direction's accent is a single 1px selection line: active shot, active timeline span, and the Play control. Numbers and labels stay white or grey; no status is carried by colour alone. Design-taste's inspector passes at 1440, 768 and 390 with `font-not-dealt` allowed, because the project's local licensed fonts replace the dealt Public Sans by design. Its one lint warning is intentional: monospace is confined to clock and frame readouts.
 
 ## Scope and limits
 
@@ -48,4 +48,4 @@ bun run validate
 bun run render
 ```
 
-Representative screenshots are in `docs/screenshots/`.
+Representative screenshots are in `docs/screenshots/`. The Phase 1 verification results are in [studio-phase1-report.md](studio-phase1-report.md).

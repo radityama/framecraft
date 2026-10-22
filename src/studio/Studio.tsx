@@ -21,11 +21,15 @@ export function Studio() {
   const [notice, setNotice] = useState('Loading preview…');
   const player = useRef<PlayerRef>(null);
   const pending = useRef<number | null>(0);
+  const confirmed = useRef<number | null>(null);
+  const frameRef = useRef(0);
   const scene = project?.scenes.find(candidate => candidate.id === sceneId);
 
   const openScene = useCallback((next: Scene, push: boolean) => {
     if (push) history.pushState(null, '', `?clip=${encodeURIComponent(next.id)}`);
     pending.current = 0;
+    confirmed.current = null;
+    frameRef.current = 0;
     setSceneId(next.id);
     setRouteError(undefined);
     setFrame(0);
@@ -37,6 +41,7 @@ export function Studio() {
   const seek = useCallback((target: number, gate = true) => {
     if (!scene) return;
     const bounded = Math.min(scene.durationFrames - 1, Math.max(0, Math.round(target)));
+    frameRef.current = bounded;
     setFrame(bounded);
     if (gate) {
       pending.current = bounded;
@@ -99,7 +104,11 @@ export function Studio() {
   useEffect(() => {
     const instance = player.current;
     if (!instance || !scene) return;
-    const onFrame = ({detail}: {detail: {frame: number}}) => setFrame(detail.frame);
+    const onFrame = ({detail}: {detail: {frame: number}}) => {
+      if (pending.current !== null) return;
+      frameRef.current = detail.frame;
+      setFrame(detail.frame);
+    };
     const onPlay = () => {
       setPlaying(true);
       if (pending.current === null) setStatus('ready');
@@ -108,6 +117,7 @@ export function Studio() {
     const onEnded = () => {
       setPlaying(false);
       if (pending.current !== null) return;
+      frameRef.current = scene.durationFrames - 1;
       setFrame(scene.durationFrames - 1);
       setStatus('ready');
     };
@@ -144,12 +154,14 @@ export function Studio() {
         setNotice(String(event.data.message));
         return;
       }
-      if (event.data.type !== 'rendered' || pending.current === null) return;
-      const target = pending.current;
-      const shot = activeShot(scene.shots, target);
-      if (!shot || event.data.frame !== target - shot.startFrame) return;
-      if (!new URL(iframe.src).pathname.endsWith(`/${shot.entry}`)) return;
+      if (event.data.type !== 'rendered') return;
+      const shot = scene.shots.find(candidate => new URL(iframe.src).pathname.endsWith(`/${candidate.entry}`));
+      if (!shot || !Number.isSafeInteger(event.data.frame) || event.data.frame < 0 || event.data.frame >= shot.durationFrames) return;
+      const target = shot.startFrame + event.data.frame;
+      confirmed.current = target;
+      if (pending.current !== target) return;
       pending.current = null;
+      frameRef.current = target;
       setFrame(target);
       setStatus('ready');
     };
@@ -163,12 +175,19 @@ export function Studio() {
     if (playing) {
       instance.pause();
       setPlaying(false);
-      seek(instance.getCurrentFrame());
+      const current = instance.getCurrentFrame();
+      if (confirmed.current === current) {
+        pending.current = null;
+        frameRef.current = current;
+        setFrame(current);
+        setStatus('ready');
+      } else seek(current);
       return;
     }
     if (frame >= scene.durationFrames - 1) {
       pending.current = null;
       setStatus('ready');
+      frameRef.current = 0;
       setFrame(0);
       instance.seekTo(0);
     }
@@ -180,7 +199,7 @@ export function Studio() {
   const step = (delta: number) => {
     player.current?.pause();
     setPlaying(false);
-    seek(frame + delta);
+    seek(frameRef.current + delta);
   };
 
   const jump = (shot: Shot) => {
@@ -188,6 +207,23 @@ export function Studio() {
     setPlaying(false);
     seek(shot.startFrame);
   };
+
+  useEffect(() => {
+    if (!scene || routeError) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey ||
+        (event.target instanceof Element && event.target.closest('button, input, select, textarea, [contenteditable]'))) return;
+      if (event.code === 'Space' && !event.repeat) {
+        event.preventDefault();
+        toggle();
+      } else if (event.code === 'ArrowLeft' || event.code === 'ArrowRight') {
+        event.preventDefault();
+        step(event.code === 'ArrowRight' ? 1 : -1);
+      }
+    };
+    addEventListener('keydown', onKeyDown);
+    return () => removeEventListener('keydown', onKeyDown);
+  });
 
   if (loadError) {
     return <main className="studio-message">
@@ -233,6 +269,18 @@ export function Studio() {
       </div>
     </section> : scene && <>
       <div className="workspace">
+        <aside className="shots" aria-label="Shots">
+          <h2>Shots <span className="muted">{scene.shots.length} · {scene.durationFrames}f</span></h2>
+          <ol>
+            {scene.shots.map(shot => <li key={shot.id}>
+              <button type="button" data-active={shot.id === active?.id} aria-current={shot.id === active?.id ? 'true' : undefined}
+                onClick={() => jump(shot)}>
+                <span>{shot.id}</span>
+                <span className="muted">{shot.durationFrames}f</span>
+              </button>
+            </li>)}
+          </ol>
+        </aside>
         <section className="preview" aria-label="Preview">
           <div className="stage" id="stage" data-state={status} data-scene={scene.id} data-frame={frame} data-shot={active?.id ?? ''}>
             <Player
@@ -278,19 +326,6 @@ export function Studio() {
             <p className="frame-count">Frame {frame} of {scene.durationFrames - 1}</p>
           </div>
         </section>
-
-        <aside className="shots" aria-label="Shots">
-          <h2>Shots <span className="muted">{scene.shots.length} · {scene.durationFrames}f</span></h2>
-          <ol>
-            {scene.shots.map(shot => <li key={shot.id}>
-              <button type="button" data-active={shot.id === active?.id} aria-current={shot.id === active?.id ? 'true' : undefined}
-                onClick={() => jump(shot)}>
-                <span>{shot.id}</span>
-                <span className="muted">{shot.durationFrames}f</span>
-              </button>
-            </li>)}
-          </ol>
-        </aside>
       </div>
     </>}
   </main>;

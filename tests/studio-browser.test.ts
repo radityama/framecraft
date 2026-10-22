@@ -125,6 +125,42 @@ test('rapid seeks settle on the newest frame only', async () => {
   }
 }, 120000);
 
+test('keyboard shortcuts step from the newest frame and leave focused controls alone', async () => {
+  const {page, errors} = await open('/?clip=intro');
+  try {
+    await ready(page, 0);
+    await page.locator('body').click({position: {x: 4, y: 4}});
+    await page.keyboard.press('ArrowRight');
+    await ready(page, 1);
+    await page.keyboard.press('ArrowLeft');
+    await ready(page, 0);
+    await page.keyboard.press('Space');
+    await page.getByRole('button', {name: 'Pause'}).waitFor();
+    await page.keyboard.press('Space');
+    await page.getByRole('button', {name: 'Play'}).waitFor();
+    await page.waitForFunction(() => document.querySelector('#stage')?.getAttribute('data-state') === 'ready', undefined, {timeout: 20000});
+    const paused = Number(await stage(page).getAttribute('data-frame'));
+    await page.waitForTimeout(250);
+    expect(Number(await stage(page).getAttribute('data-frame'))).toBe(paused);
+
+    const range = page.getByRole('slider', {name: 'Timeline frame'});
+    await range.focus();
+    await page.keyboard.press('ArrowRight');
+    await ready(page, paused + 1);
+    await page.getByRole('button', {name: 'Next frame'}).focus();
+    await page.keyboard.press('Space');
+    await ready(page, paused + 2);
+    await page.locator('body').click({position: {x: 4, y: 4}});
+    await page.keyboard.press('ArrowRight');
+    await page.keyboard.press('ArrowRight');
+    await page.keyboard.press('ArrowRight');
+    await ready(page, paused + 5);
+    expect(errors).toEqual([]);
+  } finally {
+    await page.close();
+  }
+}, 120000);
+
 test('plays, pauses without drift, and stops at the last frame', async () => {
   const {page, errors} = await open('/?clip=intro');
   try {
@@ -212,6 +248,39 @@ test('shows loading, empty, error, and runtime failure states', async () => {
     await page.locator('input[type=range]').fill('60');
     await page.getByRole('alert').getByText(/Shot exploded/).waitFor({timeout: 30000});
     expect(await stage(page).getAttribute('data-state')).toBe('error');
+  } finally {
+    await page.close();
+  }
+}, 120000);
+
+test('reports a missing image asset instead of displaying an acknowledged frame', async () => {
+  const {page} = await open('/?clip=intro');
+  try {
+    await ready(page, 0);
+    await page.route('**/public/scenes/intro/shots/02-diagram/index.html', route => route.fulfill({
+      contentType: 'text/html',
+      body: '<!doctype html><img src="/public/missing-preview-image.png"><script src="/public/runtime.js"></script><script>framecraft.shot({renderFrame() {}});</script>',
+    }));
+    await page.getByRole('slider', {name: 'Timeline frame'}).fill('60');
+    await page.getByRole('alert').getByText(/image|decode|missing/i).waitFor({timeout: 30000});
+    expect(await stage(page).getAttribute('data-state')).toBe('error');
+    expect(await page.locator('iframe').count()).toBe(1);
+  } finally {
+    await page.close();
+  }
+}, 120000);
+
+test('keeps the active shot and controls in view on a phone', async () => {
+  const {page} = await open('/?clip=intro');
+  try {
+    await page.setViewportSize({width: 390, height: 844});
+    await ready(page, 0);
+    await seek(page, 285);
+    const active = await page.locator('.shots button[data-active="true"]').boundingBox();
+    expect(active).not.toBeNull();
+    expect(active!.x + active!.width).toBeLessThanOrEqual(390);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
+    expect(await page.getByRole('button', {name: 'Play'}).isVisible()).toBe(true);
   } finally {
     await page.close();
   }

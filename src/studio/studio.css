@@ -74,7 +74,7 @@ select {
 
 .workspace {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 240px;
+  grid-template-columns: 240px minmax(0, 1fr);
   gap: 24px;
   align-items: start;
 }
@@ -182,8 +182,8 @@ select {
 
 @media (max-width: 900px) {
   .workspace { grid-template-columns: minmax(0, 1fr); }
-  .shots ol { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px; }
-  .shots li { min-width: 0; }
+  .shots ol { flex-direction: row; overflow-x: auto; }
+  .shots li { flex: 0 0 132px; }
 }
 
 @media (max-width: 560px) {
@@ -195,6 +195,8 @@ select {
   select { min-height: 44px; width: 100%; }
   .transport button { min-height: 44px; }
   .timecode { margin-left: 0; width: 100%; }
-  .shots ol { grid-template-columns: 1fr; }
+  .shots ol { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); overflow: visible; }
+  .shots li { min-width: 0; }
+  .shots button span:first-child { overflow: hidden; text-overflow: ellipsis; }
   .shots button { min-height: 44px; }
 }
