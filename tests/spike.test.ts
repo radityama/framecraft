@@ -31,6 +31,19 @@ beforeAll(async () => {
 
 afterAll(async () => { await page?.close(); await browser?.close(); server?.stop(); });
 
+test('minimal shot registers once, runs optional hooks, and renders a requested frame without returning a value', async () => {
+  await page.evaluate(() => (window as any).mount('/tests/fixtures/minimal-shot.html', {id:'minimal',fps:30,durationFrames:3,width:1920,height:1080}));
+  const child = page.frameLocator('iframe');
+  expect(await child.locator('body').getAttribute('data-prepared')).toBe('1');
+  await page.evaluate(() => (window as any).seek(2));
+  expect(await child.locator('#label').innerText()).toBe('2');
+  await page.evaluate(() => (window as any).seek(0));
+  expect(await child.locator('#label').innerText()).toBe('0');
+  expect(await child.locator('body').getAttribute('data-prepared')).toBe('1');
+  await child.locator('body').evaluate(() => dispatchEvent(new Event('pagehide')));
+  expect(await child.locator('body').getAttribute('data-disposed')).toBe('yes');
+});
+
 test('diagram reverse seek 70,10,70 preserves identical pixels', async () => {
   await page.evaluate(() => (window as any).mount('/projects/demo/scenes/intro/shots/02-diagram/index.html', {id:'diagram',fps:30,durationFrames:90,width:1920,height:1080}));
   await page.evaluate(() => (window as any).seek(70));
@@ -45,6 +58,12 @@ test('diagram reverse seek 70,10,70 preserves identical pixels', async () => {
 
 test('commit cursor renders the same pixels when frame 30 is revisited', async () => {
   await page.evaluate(() => (window as any).mount('/projects/demo/scenes/intro/shots/04-commit/index.html', {id:'commit',fps:30,durationFrames:120,width:1920,height:1080}));
+  await page.evaluate(() => (window as any).seek(0));
+  expect(await page.frameLocator('iframe').locator('.command').evaluate(command => ({
+    family: getComputedStyle(command).fontFamily,
+    loaded: document.fonts.check('400 56px "JetBrains Mono"', 'git commit'),
+    face: Array.from(document.fonts).find(face => face.family === 'JetBrains Mono')?.status,
+  }))).toEqual({family: '"JetBrains Mono", monospace', loaded: true, face: 'loaded'});
   const opacity = () => page.frameLocator('iframe').locator('.cursor').evaluate(cursor => getComputedStyle(cursor).opacity);
   const read = async () => {
     await page.evaluate(() => (window as any).seek(30));
