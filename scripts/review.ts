@@ -123,19 +123,27 @@ async function main() {
   const bundleDir = await mkdtemp(join(tmpdir(), 'framecraft-bundle-'));
   let browser: Awaited<ReturnType<typeof openBrowser>> | undefined;
   try {
-    const serveUrl = await bundle({entryPoint: join(repo, 'src/spike/index.tsx'), publicDir: demoRoot, outDir: bundleDir});
-    browser = await openBrowser('chrome', {browserExecutable});
+    let serveUrl: string | undefined;
+    let setupFailure: string | undefined;
+    try { serveUrl = await bundle({entryPoint: join(repo, 'src/spike/index.tsx'), publicDir: demoRoot, outDir: bundleDir}); }
+    catch (error) { setupFailure = `bundle failed: ${String(error)}`; }
+    if (!setupFailure) {
+      try { browser = await openBrowser('chrome', {browserExecutable}); }
+      catch (error) { setupFailure = `browser failed to launch: ${String(error)}`; }
+    }
     const errors: string[] = [];
     const onBrowserLog = (log: {type: string; text: string}) => { if (log.type === 'error') errors.push(log.text); };
     const compositions = new Map<string, Awaited<ReturnType<typeof selectComposition>>>();
-    for (const shot of project.shots) {
-      errors.length = 0;
-      const composition = await selectComposition({serveUrl, id: shot.id, puppeteerInstance: browser, onBrowserLog});
-      if (composition.durationInFrames !== shot.durationFrames || composition.width !== project.video.width ||
-        composition.height !== project.video.height || composition.fps !== project.video.fps)
-        throw new Error(`Composition ${shot.id} differs from validated manifest`);
-      if (errors.length) throw new Error(`Browser console errors during composition ${shot.id}:\n${errors.join('\n')}`);
-      compositions.set(shot.id, composition);
+    if (!setupFailure) {
+      for (const shot of project.shots) {
+        errors.length = 0;
+        const composition = await selectComposition({serveUrl: serveUrl!, id: shot.id, puppeteerInstance: browser, onBrowserLog});
+        if (composition.durationInFrames !== shot.durationFrames || composition.width !== project.video.width ||
+          composition.height !== project.video.height || composition.fps !== project.video.fps)
+          throw new Error(`Composition ${shot.id} differs from validated manifest`);
+        if (errors.length) throw new Error(`Browser console errors during composition ${shot.id}:\n${errors.join('\n')}`);
+        compositions.set(shot.id, composition);
+      }
     }
 
     await checkOutput(output);
@@ -148,15 +156,20 @@ async function main() {
       environment: {bun: Bun.version, remotion: VERSION, chromium: version.stdout.trim(),
         os: {platform: platform(), arch: arch(), release: release()}, video: project.video, fonts: installedFonts()},
       validation, captures: [], review: {status: 'unreviewed', reviewer: null, findings: [], notes: ''}};
-    try {
-      manifest.captures = await captureFrames(frames, output, async (frame, partial) => {
-        errors.length = 0;
-        await renderStill({serveUrl, composition: compositions.get(frame.shotId)!, frame: frame.localFrame,
-          output: partial, imageFormat: 'png', puppeteerInstance: browser, onBrowserLog});
-        if (errors.length) throw new Error(`Browser console errors:\n${errors.join('\n')}`);
-      });
-    } catch (error) {
-      manifest.captures = frames.map(frame => ({...frame, status: 'failed', error: `capture interrupted: ${String(error)}`}));
+    if (setupFailure) {
+      manifest.captures = frames.map((frame, index) => ({...frame, status: 'failed',
+        error: index === 0 ? setupFailure : 'skipped after prior setup failure'}));
+    } else {
+      try {
+        manifest.captures = await captureFrames(frames, output, async (frame, partial) => {
+          errors.length = 0;
+          await renderStill({serveUrl: serveUrl!, composition: compositions.get(frame.shotId)!, frame: frame.localFrame,
+            output: partial, imageFormat: 'png', puppeteerInstance: browser, onBrowserLog});
+          if (errors.length) throw new Error(`Browser console errors:\n${errors.join('\n')}`);
+        });
+      } catch (error) {
+        manifest.captures = frames.map(frame => ({...frame, status: 'failed', error: `capture interrupted: ${String(error)}`}));
+      }
     }
     try {
       if (await sourceDigest(demoRoot) !== sha256) validation.errors.push('Project source digest changed during capture');

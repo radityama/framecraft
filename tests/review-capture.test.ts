@@ -1,17 +1,17 @@
 import {expect, test} from 'bun:test';
 import {createHash} from 'node:crypto';
-import {mkdtemp, readFile, rm, stat, symlink, writeFile} from 'node:fs/promises';
+import {chmod, mkdtemp, readFile, readdir, rm, stat, symlink, writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join, resolve} from 'node:path';
 import {sourceDigest, type ReviewManifest} from '../src/review/artifacts';
 
 const repo = resolve(import.meta.dir, '..');
-const run = async (args: string[]) => {
-  const proc = Bun.spawn(args, {cwd: repo, stdout: 'pipe', stderr: 'pipe'});
+const run = async (args: string[], env = process.env) => {
+  const proc = Bun.spawn(args, {cwd: repo, env, stdout: 'pipe', stderr: 'pipe'});
   const [out, err, exit] = await Promise.all([new Response(proc.stdout).text(), new Response(proc.stderr).text(), proc.exited]);
   return {out, err, exit};
 };
-const review = (args: string[]) => run(['bun', 'run', 'review', ...args]);
+const review = (args: string[], env?: NodeJS.ProcessEnv) => run(['bun', 'run', 'review', ...args], env);
 const sourceStatus = () => run(['git', 'status', '--porcelain', '--untracked-files=all', '--', 'projects/demo']);
 const digest = (bytes: Buffer) => createHash('sha256').update(bytes).digest('hex');
 
@@ -72,3 +72,31 @@ test('retains repeatable PNGs and never writes source or replaces review output'
     expect(await sourceDigest(join(repo, 'projects/demo'))).toBe(digestBefore);
   } finally { await rm(root, {recursive: true, force: true}); }
 }, 420000);
+
+test('browser launch failure retains failed review without leaving a bundle; invalid milestones stay artifact-free', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'framecraft-review-failed-browser-'));
+  const browser = join(root, 'fake-chrome');
+  const output = join(root, 'failed');
+  const invalid = join(root, 'invalid');
+  const env = {...process.env, CHROME_BIN: browser, TMPDIR: root};
+  const sourceBefore = await sourceDigest(join(repo, 'projects/demo'));
+  const statusBefore = (await sourceStatus()).out;
+  try {
+    await writeFile(browser, '#!/bin/sh\nif [ "$1" = "--version" ]; then echo "Chromium 157.0.8080.0"; else exit 1; fi\n');
+    await chmod(browser, 0o755);
+    const result = await review(['--output', output], env);
+    expect(result.exit).not.toBe(0);
+    const manifest = JSON.parse(await readFile(join(output, 'manifest.json'), 'utf8')) as ReviewManifest;
+    expect(manifest.captures).toHaveLength(16);
+    expect(manifest.captures.every(capture => capture.status === 'failed')).toBe(true);
+    expect(manifest.captures[0]).toMatchObject({status: 'failed', error: expect.stringContaining('browser')});
+    expect(manifest.captures.slice(1).every(capture => capture.status === 'failed' && capture.error.includes('skipped'))).toBe(true);
+    expect(await readFile(join(output, 'summary.md'), 'utf8')).toContain('Review: unreviewed');
+    expect((await review(['--check', join(output, 'manifest.json')])).exit).not.toBe(0);
+    expect((await readdir(root)).filter(name => name.startsWith('framecraft-bundle-'))).toEqual([]);
+    expect((await review(['--output', invalid, '--milestone', 'diagram:90'], env)).exit).not.toBe(0);
+    await expect(stat(invalid)).rejects.toThrow();
+    expect((await sourceStatus()).out).toBe(statusBefore);
+    expect(await sourceDigest(join(repo, 'projects/demo'))).toBe(sourceBefore);
+  } finally { await rm(root, {recursive: true, force: true}); }
+}, 120000);
