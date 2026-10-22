@@ -25,6 +25,8 @@ The Studio mounts the same `SceneComposition` as the Remotion export inside `@re
 
 Playback advances through the Player's frame updates; the acknowledgement gate applies to manual seeks and paused frames that have not settled yet. Switching scenes unmounts the Player and its iframe, drops pending acknowledgements and resets frame, playback and error state. A shot that throws, fails to load, or references an image that cannot decode shows an error with a retry.
 
+Audio follows the Player clock across play, pause, frame seeks and scene switches. Browsers may block autoplay until the user interacts. Cues are declared in the scene and shot manifests, not in the HTML iframe; see [Audio](audio.md).
+
 ## Interface notes
 
 The Studio is an app screen, not a marketing page: the preview is the focal point and the chrome stays quiet. It uses the already bundled IBM Plex Sans for interface text and JetBrains Mono only for the timecode and frame readouts, so the workspace and its output share one type system without remote assets. The fixed dark theme is deliberate for judging video colour.
@@ -33,7 +35,7 @@ The `data-terminal` direction's accent is a single 1px selection line: active sh
 
 ## Scope and limits
 
-- Read-only preview: no shot editing, drag-and-drop, audio, narration, live video or transitions.
+- Read-only preview: no shot editing, drag-and-drop, narration generation, live video or transitions.
 - The project loader used here accepts zero or more scenes. The existing `bun run render` path still requires exactly one scene, so the demo exports `intro` as before; previewing a multi-scene project does not change what the renderer can export.
 - Cross-machine pixel identity is not guaranteed; see [ADR 0001](adr/0001-renderer.md).
 - The theme is fixed; there is no toggle.

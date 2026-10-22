@@ -14,11 +14,12 @@ bun run snap --shot commit --frame 60
 bun run snap --shot commit --frame 119
 bun run render --shot diagram
 bun run render
+bun run render --output /path/to/intro.mp4
 bun run hash
 bun run studio
 ```
 
-Outputs are written under `output/snaps/` and `output/`, outside the bundled project assets. `--frame` is an integer zero-based frame in the selected shot or entire scene; `--shot` selects an ID from `projects/demo/scenes/intro/scene.json` (`title`, `diagram`, `close`, `commit`). The full scene contains 330 frames; the shots last 60, 90, 60, and 120 frames, with no overlaps. A shot-scoped `--frame` is shot-local. CLI inputs and project metadata are validated before bundling. Failure removes only the unfinished `.partial-*` output, leaving any previous render intact. The CLI currently targets this one demo project; `render` and `snap` are spike commands that export or still the one scene, not a general project loader. For frame-by-frame inspection in a browser, use `bun run studio` and see [Preview Studio](studio.md).
+Outputs are written under `output/snaps/` and `output/` by default, outside the bundled project assets. `--output` overrides the destination (absolute or relative to the working directory); use `.mp4` with `render` and `.png` with `snap`. `--frame` is an integer zero-based frame in the selected shot or entire scene; `--shot` selects an ID from `projects/demo/scenes/intro/scene.json` (`title`, `diagram`, `close`, `commit`). The full scene contains 330 frames; the shots last 60, 90, 60, and 120 frames, with no overlaps. A shot-scoped `--frame` is shot-local. CLI inputs and project metadata are validated before bundling. The renderer writes a process-specific `.partial-*` file beside the destination and renames it only after a successful nonempty render; failure removes the partial and preserves a previous file. The CLI currently targets this one demo project; `render` and `snap` are spike commands that export or still the one scene, not a general project loader. For frame-by-frame inspection in a browser, use `bun run studio` and see [Preview Studio](studio.md). For audio authoring see [Audio](audio.md).
 
 The project schema is `projects/demo/project.json` → `scenes/intro/scene.json` → independent HTML shot entries. For a new shot, follow `AGENTS.md`: include `runtime.js`, register `window.framecraft.shot()` once, and **set** the exact frame state in `renderFrame(ctx)` (no return value required). The bridge exchanges same-origin, versioned `init`, `ready`, `seek`, `rendered`, and `error` messages. React's `useCurrentFrame()` in the shot's `<Sequence>` gives a shot-local frame; rendering waits for the matching `rendered` message before taking a still. Unacknowledged frames cancel after approximately 9 seconds. CSS/WAAPI animations and paused GSAP timelines registered with `window.framecraft.timeline(timeline)` are explicitly sought to `ctx.seconds`; the `timelines: [timeline]` shot property still works but is deprecated. All assets must be local.
 
@@ -48,7 +49,7 @@ The comparison uses Bash and `jq` as optional diagnostic tools; replace `USER@VP
 Packages `remotion`, `@remotion/{bundler,cli,renderer,player}` are pinned at 4.0.537; React is 19.3.1 and GSAP 3.15.0. `bunx remotion browser ensure` installed Headless Shell Chromium 157.0.8080.0 at `node_modules/.remotion/chrome-headless-shell/linux64/chrome-headless-shell-linux64/chrome-headless-shell`; override with `CHROME_BIN=/path/to/chrome` if necessary. The Remotion compositor package contains FFmpeg and ffprobe n7.1; no system installation is needed for the spike. Check exact MP4 properties with:
 
 ```sh
-node_modules/@remotion/compositor-linux-x64-gnu/ffprobe -v error -count_frames -select_streams v:0 -show_entries stream=width,height,r_frame_rate,nb_read_frames -of json output/intro.mp4
+node_modules/@remotion/compositor-linux-x64-gnu/ffprobe -v error -count_frames -show_entries stream=index,codec_type,codec_name,width,height,r_frame_rate,nb_read_frames -of json output/intro.mp4
 ```
 
-The licensing and weight trade-off is recorded in [ADR 0001](adr/0001-renderer.md). Demo output uses H.264/yuv420p. Browser assets and generated videos are not committed.
+The licensing and weight trade-off is recorded in [ADR 0001](adr/0001-renderer.md). The demo exports H.264/yuv420p video with AAC audio; shot-only exports include only that shot's audio, so `title` has no audio stream. Browser assets and generated videos are not committed.

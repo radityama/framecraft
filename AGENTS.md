@@ -38,6 +38,8 @@ For GSAP, include `../../../../assets/vendor/gsap.min.js` **after** `runtime.js`
 
 Keep scripts, images, styles and fonts inside `projects/demo/`; never fetch remote assets. Prefer the bundled IBM Plex Serif, IBM Plex Sans or JetBrains Mono from `../../../../assets/fonts/fonts.css` and put the matching family first in `font-family`. That stylesheet declares local WOFF2 faces; check glyph coverage if you use non-Latin text. The runtime waits for fonts and document images before acknowledging a frame; verify the intended font actually loaded in the rendered still, not just that a fallback looks plausible.
 
+Audio is declared in `scene.audio` or each shot's `audio` list, not in shot HTML; see `docs/audio.md`.
+
 ## Authoring checks and boundary
 
 Run `bun run validate` (a conservative static warning scan, **not** a determinism proof). Inspect the first, a middle, and the last frame; for the 120-frame demo commit shot, run `bun run snap --shot commit --frame 0`, `bun run snap --shot commit --frame 60`, and `bun run snap --shot commit --frame 119`. Substitute your own shot ID and shot-local frames when authoring. Off-viewport content can produce a valid but wrong still. Seek middle → first → middle to catch stateful rendering. Register the shot in `projects/demo/scenes/intro/scene.json`, update the shot list and total in `docs/rendering.md`, and render the scene with `bun run render`. See `docs/rendering.md` for setup and export commands.
