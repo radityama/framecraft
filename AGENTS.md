@@ -46,6 +46,10 @@ Run `bun run validate` (a conservative static warning scan, **not** a determinis
 
 Shot authors depend on `window.framecraft.shot`, optional `window.framecraft.timeline`, and the context above. The iframe message bridge, Remotion composition, browser readiness handshake, and temporary bundle management are internal implementation details; do not call them from shot HTML. Frame acknowledgement follows rendering, animation seeking, font/image readiness and settling, but is not a timer-driven playback API.
 
+## Agent visual review
+
+Follow the ten steps in [docs/agent-workflow.md](docs/agent-workflow.md). These are repository Markdown guides usable by any coding agent without provider-specific installation or MCP: [storyboard](skills/framecraft-storyboard/SKILL.md), [HTML shot](skills/framecraft-html-shot/SKILL.md), [motion](skills/framecraft-motion/SKILL.md), [visual review](skills/framecraft-visual-review/SKILL.md), [sound](skills/framecraft-sound/SKILL.md), [export](skills/framecraft-export/SKILL.md). Review requires opening retained PNGs and a named decision; a capture never automatically accepts a shot. The renderer currently exports only the demo intro scene.
+
 <!-- antislop:start -->
 ## antislop
 For UI, people, or mobile layout work, read `antislop.md` (core) and then the skill for the task:

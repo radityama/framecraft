@@ -1,0 +1,3 @@
+# Framecraft export
+
+Repository Markdown guide, not a provider-installed dependency. Run `bun run validate`, inspect the retained review PNGs, record a named decision and pass `bun run review --check <manifest>` before `bun run render`. Consult `docs/rendering.md` for commands and its bundled FFprobe stream probe; confirm video dimensions, decoded frame count, frame rate, codec and audio codec. `bun test` includes audio-export regression checks. The CLI currently exports only the statically registered demo intro scene. Note any unperformed cross-machine or human listening checks rather than implying them.
