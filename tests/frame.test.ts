@@ -3,10 +3,10 @@ import {activeShot, formatTime} from '../src/studio/frame';
 import type {Shot} from '../src/spike/project';
 
 const shots: Shot[] = [
-  {id: 'title', entry: 'a.html', durationFrames: 60, startFrame: 0},
-  {id: 'diagram', entry: 'b.html', durationFrames: 90, startFrame: 60},
-  {id: 'close', entry: 'c.html', durationFrames: 60, startFrame: 150},
-  {id: 'commit', entry: 'd.html', durationFrames: 120, startFrame: 210},
+  {id: 'title', entry: 'a.html', durationFrames: 60, startFrame: 0, audio: []},
+  {id: 'diagram', entry: 'b.html', durationFrames: 90, startFrame: 60, audio: []},
+  {id: 'close', entry: 'c.html', durationFrames: 60, startFrame: 150, audio: []},
+  {id: 'commit', entry: 'd.html', durationFrames: 120, startFrame: 210, audio: []},
 ];
 
 test('formatTime converts frames to mm:ss:ff', () => {

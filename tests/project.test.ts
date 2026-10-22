@@ -48,11 +48,11 @@ test('loads validated scenes in order without changing the single-scene export g
     id: 'demo', title: 'Renderer trial', video: {width: 1920, height: 1080, fps: 30},
     scenes: [
       {id: 'intro', title: 'Renderer trial', shots: [
-        {id: 'title', entry: 'scenes/intro/shots/title.html', durationFrames: 60, startFrame: 0},
-        {id: 'diagram', entry: 'scenes/intro/shots/diagram.html', durationFrames: 90, startFrame: 60},
-        {id: 'close', entry: 'scenes/intro/shots/close.html', durationFrames: 60, startFrame: 150},
-      ], durationFrames: 210},
-      {id: 'second', title: 'Second', shots: [{id: 'next', entry: 'scenes/second/shots/next.html', durationFrames: 30, startFrame: 0}], durationFrames: 30},
+        {id: 'title', entry: 'scenes/intro/shots/title.html', durationFrames: 60, startFrame: 0, audio: []},
+        {id: 'diagram', entry: 'scenes/intro/shots/diagram.html', durationFrames: 90, startFrame: 60, audio: []},
+        {id: 'close', entry: 'scenes/intro/shots/close.html', durationFrames: 60, startFrame: 150, audio: []},
+      ], durationFrames: 210, audio: []},
+      {id: 'second', title: 'Second', shots: [{id: 'next', entry: 'scenes/second/shots/next.html', durationFrames: 30, startFrame: 0, audio: []}], durationFrames: 30, audio: []},
     ],
   });
   expect(loadProject(data.root)).rejects.toThrow('exactly one scene');
