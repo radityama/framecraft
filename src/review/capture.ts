@@ -2,7 +2,7 @@ import {createHash} from 'node:crypto';
 import {link, mkdir, readFile, rm} from 'node:fs/promises';
 import {join} from 'node:path';
 import type {ReviewFrame} from './frames';
-import type {ReviewCapture} from './artifacts';
+import {validatePng, type ReviewCapture} from './artifacts';
 
 export async function captureFrames(frames: ReviewFrame[], output: string,
   render: (frame: ReviewFrame, partialPath: string) => Promise<void>): Promise<ReviewCapture[]> {
@@ -19,8 +19,7 @@ export async function captureFrames(frames: ReviewFrame[], output: string,
     try {
       await render(frame, partial);
       const bytes = await readFile(partial);
-      if (bytes.length <= 8 || bytes.subarray(0, 8).toString('hex') !== '89504e470d0a1a0a')
-        throw new Error(`invalid PNG: ${frame.shotId}:${frame.localFrame}`);
+      await validatePng(partial, bytes);
       const sha256 = createHash('sha256').update(bytes).digest('hex');
       await link(partial, destination);
       captures.push({...frame, status: 'captured', sha256});

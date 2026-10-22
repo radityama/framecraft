@@ -165,3 +165,34 @@ test('invalid rendered PNG is never published', async () => {
   expect(captures[0]).toMatchObject({status: 'failed', error: expect.stringContaining('PNG')});
   expect(await readdir(join(data.output, 'screenshots'))).toEqual(['only-local-0000-global-0000.png']);
 });
+
+test('capture rejects a PNG signature without decodable pixels and cleans its partial', async () => {
+  const data = await fixture();
+  const frame = selectReviewFrames([{id: 'bad', startFrame: 0, durationFrames: 1}], [])[0]!;
+  const captures = await captureFrames([frame], data.output, async (_, path) => {
+    await writeFile(path, Buffer.concat([png.subarray(0, 8), Buffer.from('X')]));
+  });
+  expect(captures[0]).toMatchObject({status: 'failed', error: expect.stringContaining('PNG')});
+  expect(await readdir(join(data.output, 'screenshots'))).toEqual(['only-local-0000-global-0000.png']);
+});
+
+test('read-only check rejects a correctly hashed PNG signature without decodable pixels', async () => {
+  const data = await fixture();
+  const bad = Buffer.concat([png.subarray(0, 8), Buffer.from('X')]);
+  await writeFile(join(data.output, data.frame.path), bad);
+  data.manifest.captures[0] = {...data.frame, status: 'captured', sha256: hash(bad)};
+  await data.save();
+  await expect(verifyReview(join(data.output, 'manifest.json'), data.root)).rejects.toThrow('PNG');
+});
+
+test('read-only check rejects contradictory status-specific capture fields', async () => {
+  const data = await fixture();
+  const path = join(data.output, 'manifest.json');
+  Object.assign(data.manifest.captures[0]!, {error: 'browser failed'});
+  await data.save();
+  await expect(verifyReview(path, data.root)).rejects.toThrow('error');
+  data.manifest.captures = [Object.assign({...data.frame, status: 'failed' as const, error: 'browser failed'},
+    {sha256: hash(png)})];
+  await data.save();
+  await expect(verifyReview(path, data.root)).rejects.toThrow('sha256');
+});

@@ -2,6 +2,7 @@ import {createHash} from 'node:crypto';
 import {constants} from 'node:fs';
 import {open, readdir, readFile, readlink, realpath, stat} from 'node:fs/promises';
 import {dirname, isAbsolute, join, relative, sep} from 'node:path';
+import {RenderInternals} from '@remotion/renderer';
 import {loadProject} from '../spike/project';
 import {SELECTION_POLICY, selectReviewFrames, type ReviewFrame} from './frames';
 
@@ -21,6 +22,16 @@ export type ReviewManifest = {
 
 const shaPattern = /^[0-9a-f]{64}$/;
 const pngHeader = '89504e470d0a1a0a';
+
+export async function validatePng(path: string, bytes: Buffer): Promise<void> {
+  if (bytes.length <= 8 || bytes.subarray(0, 8).toString('hex') !== pngHeader)
+    throw new Error(`invalid PNG: ${path}`);
+  const binary = RenderInternals.getExecutablePath({type: 'ffmpeg', indent: false, logLevel: 'error', binariesDirectory: null});
+  const proc = Bun.spawn([binary, '-v', 'error', '-xerror', '-f', 'image2pipe', '-c:v', 'png', '-i', path,
+    '-frames:v', '1', '-c:v', 'rawvideo', '-f', 'null', '-'], {stdout: 'ignore', stderr: 'pipe'});
+  const [error, exit] = await Promise.all([new Response(proc.stderr).text(), proc.exited]);
+  if (exit !== 0) throw new Error(`invalid PNG: ${path}: ${error.trim()}`);
+}
 
 function inside(base: string, target: string): boolean {
   const path = relative(base, target);
@@ -114,9 +125,13 @@ function parseManifest(value: unknown): ReviewManifest {
     integer(capture.localFrame, `captures[${index}].localFrame`);
     integer(capture.globalFrame, `captures[${index}].globalFrame`);
     text(capture.path, `captures[${index}].path`);
-    if (capture.status === 'captured') digest(capture.sha256, `captures[${index}].sha256`);
-    else if (capture.status === 'failed') text(capture.error, `captures[${index}].error`);
-    else throw new Error(`captures[${index}].status is invalid`);
+    if (capture.status === 'captured') {
+      digest(capture.sha256, `captures[${index}].sha256`);
+      if ('error' in capture) throw new Error(`captures[${index}].error is invalid for captured status`);
+    } else if (capture.status === 'failed') {
+      text(capture.error, `captures[${index}].error`);
+      if ('sha256' in capture) throw new Error(`captures[${index}].sha256 is invalid for failed status`);
+    } else throw new Error(`captures[${index}].status is invalid`);
   }
   const review = object(manifest.review, 'review');
   if (!['unreviewed', 'needs-revision', 'accepted'].includes(review.status as string)) throw new Error('review.status is invalid');
@@ -178,6 +193,7 @@ export async function verifyReview(manifestPath: string, projectRoot: string,
       throw new Error(`invalid PNG: ${capture.path}`);
     if (createHash('sha256').update(bytes).digest('hex') !== capture.sha256)
       throw new Error(`capture hash mismatch: ${capture.path}`);
+    await validatePng(file, bytes);
   }
   if (manifest.validation.exitCode !== 0 || manifest.validation.errors.length)
     throw new Error('validation failed');
