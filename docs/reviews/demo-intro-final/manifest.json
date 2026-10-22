@@ -1,0 +1,217 @@
+{
+  "schemaVersion": 1,
+  "projectId": "demo",
+  "sceneId": "intro",
+  "source": {
+    "gitCommit": "1de7a3d9908e0bd4039517c1e1a318312a36571f",
+    "trackedDirty": true,
+    "untrackedDirty": false,
+    "sha256": "c14ff630deebdaa2bdcbc8b085283953ce3b2a35a547aefb0b17e05e57db9e78"
+  },
+  "selection": {
+    "policy": "boundaries-midpoints-v1",
+    "milestones": [
+      "title:20",
+      "diagram:30",
+      "commit:60",
+      "commit:90"
+    ]
+  },
+  "environment": {
+    "bun": "1.4.3",
+    "remotion": "4.0.537",
+    "chromium": "Chromium 157.0.8080.0",
+    "os": {
+      "platform": "linux",
+      "arch": "x64",
+      "release": "7.2.11-200.fc44.x86_64"
+    },
+    "video": {
+      "width": 1920,
+      "height": 1080,
+      "fps": 30
+    },
+    "fonts": []
+  },
+  "validation": {
+    "command": "bun run validate",
+    "exitCode": 0,
+    "warnings": [],
+    "errors": []
+  },
+  "captures": [
+    {
+      "shotId": "title",
+      "localFrame": 0,
+      "globalFrame": 0,
+      "path": "screenshots/title-local-0000-global-0000.png",
+      "status": "captured",
+      "sha256": "7d1b72c5cc1ddc95c8565493e4e4dc00d3a2e4f7ea9b18fa930eb15fe67f67f1"
+    },
+    {
+      "shotId": "title",
+      "localFrame": 20,
+      "globalFrame": 20,
+      "path": "screenshots/title-local-0020-global-0020.png",
+      "status": "captured",
+      "sha256": "c3b66bc7d12f83c1f1b3c8d330e24461efb555eba906f82498c4ae506efc34cf"
+    },
+    {
+      "shotId": "title",
+      "localFrame": 29,
+      "globalFrame": 29,
+      "path": "screenshots/title-local-0029-global-0029.png",
+      "status": "captured",
+      "sha256": "c3b66bc7d12f83c1f1b3c8d330e24461efb555eba906f82498c4ae506efc34cf"
+    },
+    {
+      "shotId": "title",
+      "localFrame": 59,
+      "globalFrame": 59,
+      "path": "screenshots/title-local-0059-global-0059.png",
+      "status": "captured",
+      "sha256": "c3b66bc7d12f83c1f1b3c8d330e24461efb555eba906f82498c4ae506efc34cf"
+    },
+    {
+      "shotId": "diagram",
+      "localFrame": 0,
+      "globalFrame": 60,
+      "path": "screenshots/diagram-local-0000-global-0060.png",
+      "status": "captured",
+      "sha256": "cdcdd15de13159b630f7dcf95d834c2959abfe0ed5612ed49cba4a584755ece3"
+    },
+    {
+      "shotId": "diagram",
+      "localFrame": 22,
+      "globalFrame": 82,
+      "path": "screenshots/diagram-local-0022-global-0082.png",
+      "status": "captured",
+      "sha256": "45ca55a67e286205c48854051b19097de8bbf0ac8214589a0506f7167cf4ea3d"
+    },
+    {
+      "shotId": "diagram",
+      "localFrame": 30,
+      "globalFrame": 90,
+      "path": "screenshots/diagram-local-0030-global-0090.png",
+      "status": "captured",
+      "sha256": "6b79e08c163bc3e3ff34bf3bf14eadc48bc220482724e26c8d45145f04ec93b7"
+    },
+    {
+      "shotId": "diagram",
+      "localFrame": 44,
+      "globalFrame": 104,
+      "path": "screenshots/diagram-local-0044-global-0104.png",
+      "status": "captured",
+      "sha256": "971360671ec12be1f1f12b7a3ca1f68623706444bbe6430c8d42834f23f46209"
+    },
+    {
+      "shotId": "diagram",
+      "localFrame": 66,
+      "globalFrame": 126,
+      "path": "screenshots/diagram-local-0066-global-0126.png",
+      "status": "captured",
+      "sha256": "0b3b52ddc4614624ac75c579240fd647a700e761331f444553d862074988f0eb"
+    },
+    {
+      "shotId": "diagram",
+      "localFrame": 89,
+      "globalFrame": 149,
+      "path": "screenshots/diagram-local-0089-global-0149.png",
+      "status": "captured",
+      "sha256": "960497e0914832751ec9585adbb3f2ea056cc369fee4bd87b69fb23b14743056"
+    },
+    {
+      "shotId": "close",
+      "localFrame": 0,
+      "globalFrame": 150,
+      "path": "screenshots/close-local-0000-global-0150.png",
+      "status": "captured",
+      "sha256": "b1d6f532032c333375fb723b50783c71e602ccc6964ac4827c5b36240d9d48d5"
+    },
+    {
+      "shotId": "close",
+      "localFrame": 29,
+      "globalFrame": 179,
+      "path": "screenshots/close-local-0029-global-0179.png",
+      "status": "captured",
+      "sha256": "b1d6f532032c333375fb723b50783c71e602ccc6964ac4827c5b36240d9d48d5"
+    },
+    {
+      "shotId": "close",
+      "localFrame": 59,
+      "globalFrame": 209,
+      "path": "screenshots/close-local-0059-global-0209.png",
+      "status": "captured",
+      "sha256": "b1d6f532032c333375fb723b50783c71e602ccc6964ac4827c5b36240d9d48d5"
+    },
+    {
+      "shotId": "commit",
+      "localFrame": 0,
+      "globalFrame": 210,
+      "path": "screenshots/commit-local-0000-global-0210.png",
+      "status": "captured",
+      "sha256": "2f04a52191b644113475956afe94e54cdcf06a600156f2fb929b7fe6096a2de5"
+    },
+    {
+      "shotId": "commit",
+      "localFrame": 29,
+      "globalFrame": 239,
+      "path": "screenshots/commit-local-0029-global-0239.png",
+      "status": "captured",
+      "sha256": "0c3fa4102b5fff71246d8f1ca94ab63dae77c59bf184141cd1619b6c777fe119"
+    },
+    {
+      "shotId": "commit",
+      "localFrame": 59,
+      "globalFrame": 269,
+      "path": "screenshots/commit-local-0059-global-0269.png",
+      "status": "captured",
+      "sha256": "f54236585ce42fa41c689873021c8d3d258b1d76ca39cda02ebccee202b630b0"
+    },
+    {
+      "shotId": "commit",
+      "localFrame": 60,
+      "globalFrame": 270,
+      "path": "screenshots/commit-local-0060-global-0270.png",
+      "status": "captured",
+      "sha256": "01b6ca255f5f51a0cb4ba896b7621938f2be95bdc8412d82b842a5224efea026"
+    },
+    {
+      "shotId": "commit",
+      "localFrame": 89,
+      "globalFrame": 299,
+      "path": "screenshots/commit-local-0089-global-0299.png",
+      "status": "captured",
+      "sha256": "9c5b4d5e18c9341cb3695348de2315a3f3b07e538adf9da219c0029368e7d5df"
+    },
+    {
+      "shotId": "commit",
+      "localFrame": 90,
+      "globalFrame": 300,
+      "path": "screenshots/commit-local-0090-global-0300.png",
+      "status": "captured",
+      "sha256": "9f75bbed6137cde456f75ba05982b0f378d9955a232e50389b91341d2155e5b2"
+    },
+    {
+      "shotId": "commit",
+      "localFrame": 119,
+      "globalFrame": 329,
+      "path": "screenshots/commit-local-0119-global-0329.png",
+      "status": "captured",
+      "sha256": "c5eaf14e3ff86c9b392329ab6315020e981d49259e5f325ffc4ebaea2a487e6c"
+    }
+  ],
+  "review": {
+    "status": "accepted",
+    "reviewer": {
+      "kind": "agent",
+      "name": "Framecraft review agent"
+    },
+    "findings": [
+      "No visual defect against the corrected inferred brief after individually opening all 20 new PNGs. Title local 0 is blank and 20/29/59 show the full unclipped word; diagram local 0/22/30/44/66/89 shows the pulse advancing and the Frame node growing while both labels remain readable.",
+      "Close local 0/29/59 keeps its entire sentence centered and readable. Commit local 0 has the prompt/cursor, 29 partial typing, 59 an incomplete command, 60 the complete command with output still hidden at its delay boundary, 89 visible output without the rule, 90 visible output at the zero-width rule onset, and 119 a full in-viewport rule.",
+      "Hard-cut pairs at global 59/60, 149/150 and 209/210 are distinct and unclipped. All 20 new PNG hashes match the corresponding historical capture, but the corrected brief changes the project source digest; the historical artifact has not been changed."
+    ],
+    "notes": "Agent inspected each of the 20 new PNG files in docs/reviews/demo-intro-final/screenshots individually with an image-capable reader, including all three cut pairs, first/middle/last frames and four explicit milestones. Compared the 20 new hashes with docs/reviews/demo-intro/manifest.json; all match. Acceptance is a named agent judgment against the corrected inferred brief on sampled stills only, not automatic visual validation, full-motion playback or human review. Only brief text was revised; no shot HTML or PNG was edited."
+  }
+}
