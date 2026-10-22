@@ -287,7 +287,7 @@ export function Studio() {
               key={scene.id}
               ref={player}
               component={SceneComposition}
-              inputProps={{shots: scene.shots, video: project.video}}
+              inputProps={{shots: scene.shots, video: project.video, audio: scene.audio}}
               compositionWidth={project.video.width}
               compositionHeight={project.video.height}
               durationInFrames={scene.durationFrames}

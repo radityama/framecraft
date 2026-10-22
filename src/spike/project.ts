@@ -3,7 +3,7 @@ import {isAbsolute, join, relative, sep} from 'node:path';
 import {resolveAudioTimeline, type AudioCue} from './audio';
 import {probeAudioFrames} from './audio-assets';
 
-export type Shot = {id: string; entry: string; durationFrames: number; startFrame: number; audio?: AudioCue[]};
+export type Shot = {id: string; entry: string; durationFrames: number; startFrame: number; audio: AudioCue[]};
 export type Project = {video: {width: number; height: number; fps: number}; shots: Shot[]; durationFrames: number; audio: AudioCue[]};
 export type Scene = {id: string; title: string; shots: Shot[]; durationFrames: number; audio: AudioCue[]};
 export type StudioProject = {id: string; title: string; video: Project['video']; scenes: Scene[]};

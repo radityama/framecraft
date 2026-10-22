@@ -3,9 +3,18 @@
   "title": "Renderer trial",
   "shots": [
     {"id": "title", "entry": "shots/01-title/index.html", "durationFrames": 60, "overlapFrames": 0},
-    {"id": "diagram", "entry": "shots/02-diagram/index.html", "durationFrames": 90, "overlapFrames": 0},
-    {"id": "close", "entry": "shots/03-close/index.html", "durationFrames": 60, "overlapFrames": 0},
+    {"id": "diagram", "entry": "shots/02-diagram/index.html", "durationFrames": 90, "overlapFrames": 0,
+      "audio": [{"id": "hit-b", "src": "assets/audio/hit-b.wav", "startFrame": 15,
+        "durationFrames": 24, "trimOutFrames": 20, "gain": 0.6, "loop": true}]},
+    {"id": "close", "entry": "shots/03-close/index.html", "durationFrames": 60, "overlapFrames": 0,
+      "audio": [{"id": "muted-bed", "src": "assets/audio/bed.wav", "startFrame": 0,
+        "durationFrames": 60, "trimOutFrames": 60, "gain": 0}]},
     {"id": "commit", "entry": "shots/04-commit/index.html", "durationFrames": 120, "overlapFrames": 0}
   ],
-  "audio": []
+  "audio": {"schemaVersion": 1, "cues": [
+    {"id": "bed", "src": "assets/audio/bed.wav", "startFrame": 0, "durationFrames": 330,
+      "trimOutFrames": 330, "gain": 0.35, "fadeInFrames": 6, "fadeOutFrames": 12},
+    {"id": "hit-a", "src": "assets/audio/hit-a.wav", "startFrame": 72, "durationFrames": 20,
+      "trimOutFrames": 20, "gain": 0.6}
+  ]}
 }

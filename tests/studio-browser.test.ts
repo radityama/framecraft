@@ -187,6 +187,43 @@ test('plays, pauses without drift, and stops at the last frame', async () => {
   }
 }, 120000);
 
+test('audio follows seek, pause, replay and scene switch', async () => {
+  const {page, errors} = await open('/?clip=intro');
+  try {
+    await ready(page, 0);
+    await seek(page, 78);
+    await page.waitForFunction(() => [...document.querySelectorAll<HTMLAudioElement>('audio[src*="assets/audio/"]')].filter(a => a.currentTime > 0).length >= 2);
+    const before = await page.locator('audio[src*="bed.wav"]').evaluate(node => (node as HTMLAudioElement).currentTime);
+    expect(Math.abs(before - 78 / 30)).toBeLessThan(0.35);
+    await seek(page, 96);
+    await page.waitForFunction(() => {
+      const media = document.querySelector<HTMLAudioElement>('audio[src*="hit-b.wav"]');
+      return !!media && media.currentTime > 0 && media.currentTime < 0.2;
+    }, undefined, {timeout: 10000});
+    const loopTime = await page.locator('audio[src*="hit-b.wav"]').evaluate(node => (node as HTMLAudioElement).currentTime);
+    expect(loopTime).toBeLessThan(0.2);
+    await page.getByRole('button', {name: 'Play'}).click();
+    await page.waitForFunction(() => {
+      const media = document.querySelector<HTMLAudioElement>('audio[src*="bed.wav"]');
+      return !!media && !media.paused;
+    });
+    await page.getByRole('button', {name: 'Pause'}).click();
+    await page.waitForTimeout(300);
+    const paused = await page.locator('audio[src*="assets/audio/"]').evaluateAll(nodes => nodes.map(node => (node as HTMLAudioElement).paused));
+    expect(paused.length).toBeGreaterThan(0);
+    expect(paused.every(Boolean)).toBe(true);
+    await seek(page, 329);
+    await page.getByRole('button', {name: 'Play'}).click();
+    await ready(page, 0);
+    await page.waitForFunction(() => {
+      const media = document.querySelector<HTMLAudioElement>('audio[src*="bed.wav"]');
+      return !!media && media.currentTime < 0.35;
+    });
+    expect(await page.locator('audio[src*="bed.wav"]').evaluate(node => (node as HTMLAudioElement).currentTime)).toBeLessThan(0.35);
+    expect(errors).toEqual([]);
+  } finally { await page.close(); }
+}, 120000);
+
 test('keeps the scene in the URL, recovers from an invalid clip, and switches scene cleanly', async () => {
   const page = await browser.newPage({viewport: {width: 1440, height: 900}});
   const errors: string[] = [];
@@ -194,8 +231,9 @@ test('keeps the scene in the URL, recovers from an invalid clip, and switches sc
   const second = {
     id: 'second',
     title: 'Second scene',
-    shots: [{id: 'title', entry: 'scenes/intro/shots/01-title/index.html', durationFrames: 30, startFrame: 0}],
+    shots: [{id: 'title', entry: 'scenes/intro/shots/01-title/index.html', durationFrames: 30, startFrame: 0, audio: []}],
     durationFrames: 30,
+    audio: [],
   };
   const manifest = await (await fetch(url('/api/project'))).json() as {scenes: unknown[]};
   await page.route('**/api/project', route => route.fulfill({json: {...manifest, scenes: [...manifest.scenes, second]}}));
@@ -204,8 +242,11 @@ test('keeps the scene in the URL, recovers from an invalid clip, and switches sc
     await ready(page, 0);
     expect(await page.locator('select').inputValue()).toBe('intro');
 
+    await seek(page, 78);
+    expect(await page.locator('audio[src*="assets/audio/"]').count()).toBeGreaterThanOrEqual(2);
     await page.locator('select').selectOption('second');
     await page.waitForFunction(() => document.querySelector('#stage')?.getAttribute('data-scene') === 'second' && document.querySelector('#stage')?.getAttribute('data-state') === 'ready', undefined, {timeout: 30000});
+    expect(await page.locator('audio[src*="assets/audio/"]').count()).toBe(0);
     expect(new URL(page.url()).search).toBe('?clip=second');
     expect(await page.locator('iframe').count()).toBe(1);
     expect(await page.locator('#stage').getAttribute('data-frame')).toBe('0');
