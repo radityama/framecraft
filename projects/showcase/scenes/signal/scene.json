@@ -1,0 +1,17 @@
+{
+  "id": "signal",
+  "title": "Signal / the reply",
+  "shots": [
+    {"id": "carrier", "entry": "shots/01-carrier/index.html", "durationFrames": 48, "overlapFrames": 0,
+      "audio": [{"id": "tap", "src": "assets/audio/tap.wav", "startFrame": 18,
+        "durationFrames": 12, "trimOutFrames": 12, "gain": 0.4}]},
+    {"id": "receive", "entry": "shots/02-receive/index.html", "durationFrames": 48, "overlapFrames": 0,
+      "audio": [{"id": "tap", "src": "assets/audio/tap.wav", "startFrame": 0,
+        "durationFrames": 12, "trimOutFrames": 12, "gain": 0.5}]}
+  ],
+  "audio": {"schemaVersion": 1, "cues": [
+    {"id": "hum", "src": "assets/audio/hum.wav", "startFrame": 0,
+      "durationFrames": 96, "trimOutFrames": 30, "loop": true, "gain": 0.25,
+      "fadeInFrames": 6, "fadeOutFrames": 8}
+  ]}
+}

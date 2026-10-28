@@ -2,7 +2,7 @@
 
 ## Public authoring API
 
-`projects/demo/project.json` defines the video and points to `scenes/intro/scene.json`. Each shot is an independently loaded HTML file; scene entries specify an ID, an entry relative to the scene, a positive `durationFrames`, and `overlapFrames: 0`. From `projects/demo/scenes/intro/shots/<name>/index.html`, this is a complete minimal shot:
+Each `projects/<project-id>/project.json` defines the video and references one or more scene manifests. Each shot is an independently loaded HTML file; scene entries specify an ID, an entry relative to the scene, a positive `durationFrames`, and `overlapFrames: 0`. From `projects/demo/scenes/intro/shots/<name>/index.html`, this is a complete minimal shot:
 
 ```html
 <!doctype html>
@@ -36,19 +36,19 @@ For CSS animations and Web Animations API animations, define animations without 
 
 For GSAP, include `../../../../assets/vendor/gsap.min.js` **after** `runtime.js`, create `const timeline = gsap.timeline({paused: true})`, add tweens at **absolute shot times in seconds** (for example, `timeline.to(node, {opacity: 1, duration: 1}, 2)` starts at second 2), and call `window.framecraft.timeline(timeline)` once. The runtime seeks registered timelines to `ctx.seconds` after `renderFrame`; keep them paused. The legacy `window.framecraft.shot({timelines: [timeline], renderFrame(ctx) { ... }})` form also works: `timelines` is a top-level shot property, **not** a value returned by `prepare`. Use one registration form per timeline, not both.
 
-Keep scripts, images, styles and fonts inside `projects/demo/`; never fetch remote assets. Prefer the bundled IBM Plex Serif, IBM Plex Sans or JetBrains Mono from `../../../../assets/fonts/fonts.css` and put the matching family first in `font-family`. That stylesheet declares local WOFF2 faces; check glyph coverage if you use non-Latin text. The runtime waits for fonts and document images before acknowledging a frame; verify the intended font actually loaded in the rendered still, not just that a fallback looks plausible.
+Keep scripts, images, styles and fonts inside the selected project root; never fetch remote assets. Each project needs its own `runtime.js` and local fonts or other assets referenced by its shots. The demo bundles IBM Plex Serif, IBM Plex Sans and JetBrains Mono from `../../../../assets/fonts/fonts.css`; other projects may bundle their own fonts. Put the intended family first in `font-family`, check glyph coverage for non-Latin text, and verify the actual font loaded in the rendered still. The runtime waits for fonts and document images before acknowledging a frame.
 
 Audio is declared in `scene.audio` or each shot's `audio` list, not in shot HTML; see `docs/audio.md`.
 
 ## Authoring checks and boundary
 
-Run `bun run validate` (a conservative static warning scan, **not** a determinism proof). Inspect the first, a middle, and the last frame; for the 120-frame demo commit shot, run `bun run snap --shot commit --frame 0`, `bun run snap --shot commit --frame 60`, and `bun run snap --shot commit --frame 119`. Substitute your own shot ID and shot-local frames when authoring. Off-viewport content can produce a valid but wrong still. Seek middle → first → middle to catch stateful rendering. Register the shot in `projects/demo/scenes/intro/scene.json`, update the shot list and total in `docs/rendering.md`, and render the scene with `bun run render`. See `docs/rendering.md` for setup and export commands.
+Run `bun run validate --project projects/<project-id> --scene <scene-id>` (a conservative static warning scan, **not** a determinism proof). Omit selectors for the demo. Inspect the first, a middle, and the last frame; for the 120-frame demo commit shot, run `bun run snap --shot commit --frame 0`, `bun run snap --shot commit --frame 60`, and `bun run snap --shot commit --frame 119`. For another project, add `--project` and `--scene` to each command. Off-viewport content can produce a valid but wrong still. Seek middle → first → middle to catch stateful rendering. Register the shot in its scene manifest, update the relevant shot list and total in `docs/rendering.md`, and render its scene with `bun run render --project projects/<project-id> --scene <scene-id>`. See `docs/rendering.md` for setup and export commands.
 
 Shot authors depend on `window.framecraft.shot`, optional `window.framecraft.timeline`, and the context above. The iframe message bridge, Remotion composition, browser readiness handshake, and temporary bundle management are internal implementation details; do not call them from shot HTML. Frame acknowledgement follows rendering, animation seeking, font/image readiness and settling, but is not a timer-driven playback API.
 
 ## Agent visual review
 
-Follow the ten steps in [docs/agent-workflow.md](docs/agent-workflow.md). These are repository Markdown guides usable by any coding agent without provider-specific installation or MCP: [storyboard](skills/framecraft-storyboard/SKILL.md), [HTML shot](skills/framecraft-html-shot/SKILL.md), [motion](skills/framecraft-motion/SKILL.md), [visual review](skills/framecraft-visual-review/SKILL.md), [sound](skills/framecraft-sound/SKILL.md), [export](skills/framecraft-export/SKILL.md). Review requires opening retained PNGs and a named decision; a capture never automatically accepts a shot. The renderer currently exports only the demo intro scene.
+Follow the ten steps in [docs/agent-workflow.md](docs/agent-workflow.md). These are repository Markdown guides usable by any coding agent without provider-specific installation or MCP: [storyboard](skills/framecraft-storyboard/SKILL.md), [HTML shot](skills/framecraft-html-shot/SKILL.md), [motion](skills/framecraft-motion/SKILL.md), [visual review](skills/framecraft-visual-review/SKILL.md), [sound](skills/framecraft-sound/SKILL.md), [export](skills/framecraft-export/SKILL.md). Review requires opening retained PNGs and a named decision; a capture never automatically accepts a shot. Export targets one selected scene at a time.
 
 <!-- antislop:start -->
 ## antislop

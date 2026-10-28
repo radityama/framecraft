@@ -1,8 +1,9 @@
 import {afterEach, expect, test} from 'bun:test';
-import {mkdtemp, mkdir, writeFile, symlink, rm} from 'node:fs/promises';
+import {mkdtemp, mkdir, writeFile, symlink, rm, rename} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {loadProject, loadStudioProject} from '../src/spike/project';
+import {selectScene} from '../src/spike/selection';
 
 const roots: string[] = [];
 afterEach(async () => {
@@ -40,8 +41,8 @@ test('loads validated scenes in order without changing the single-scene export g
   const data = await fixture();
   data.project.scenes.push({id: 'second', path: 'scenes/second/scene.json'});
   await mkdir(join(data.root, 'scenes/second/shots'), {recursive: true});
-  await writeFile(join(data.root, 'scenes/second/shots/next.html'), '<!doctype html>');
-  await writeFile(join(data.root, 'scenes/second/scene.json'), JSON.stringify({id: 'second', title: 'Second', shots: [{id: 'next', entry: 'shots/next.html', durationFrames: 30, overlapFrames: 0}], audio: []}));
+  await writeFile(join(data.root, 'scenes/second/shots/title.html'), '<!doctype html>');
+  await writeFile(join(data.root, 'scenes/second/scene.json'), JSON.stringify({id: 'second', title: 'Second', shots: [{id: 'title', entry: 'shots/title.html', durationFrames: 30, overlapFrames: 0}], audio: []}));
   await data.save();
   const studio = await loadStudioProject(data.root);
   expect(studio).toEqual({
@@ -52,9 +53,12 @@ test('loads validated scenes in order without changing the single-scene export g
         {id: 'diagram', entry: 'scenes/intro/shots/diagram.html', durationFrames: 90, startFrame: 60, audio: []},
         {id: 'close', entry: 'scenes/intro/shots/close.html', durationFrames: 60, startFrame: 150, audio: []},
       ], durationFrames: 210, audio: []},
-      {id: 'second', title: 'Second', shots: [{id: 'next', entry: 'scenes/second/shots/next.html', durationFrames: 30, startFrame: 0, audio: []}], durationFrames: 30, audio: []},
+      {id: 'second', title: 'Second', shots: [{id: 'title', entry: 'scenes/second/shots/title.html', durationFrames: 30, startFrame: 0, audio: []}], durationFrames: 30, audio: []},
     ],
   });
+  expect(() => selectScene(studio)).toThrow('scene');
+  expect(selectScene(studio, 'intro').shots[0]?.entry).toBe('scenes/intro/shots/title.html');
+  expect(selectScene(studio, 'second').shots[0]?.entry).toBe('scenes/second/shots/title.html');
   expect(loadProject(data.root)).rejects.toThrow('exactly one scene');
 });
 
@@ -74,6 +78,42 @@ test('rejects duplicate scene references and invalid scene paths', async () => {
   data.project.scenes[1] = {id: 'second', path: '../outside.json'};
   await data.save();
   expect(loadStudioProject(data.root)).rejects.toThrow('path escapes project');
+});
+
+test('rejects malformed scenes and scene references outside the canonical root', async () => {
+  const data = await fixture();
+  await writeFile(join(data.root, 'scenes/intro/scene.json'), JSON.stringify({id: 'intro', shots: {}}));
+  await expect(loadStudioProject(data.root)).rejects.toThrow('scene.shots must be nonempty');
+
+  const outside = await mkdtemp(join(tmpdir(), 'framecraft-outside-'));
+  roots.push(outside);
+  await writeFile(join(outside, 'scene.json'), JSON.stringify({id: 'intro', shots: data.shots, audio: []}));
+  await symlink(join(outside, 'scene.json'), join(data.root, 'scenes/intro/outside.json'));
+  data.project.scenes[0]!.path = 'scenes/intro/outside.json';
+  await data.save();
+  await expect(loadStudioProject(data.root)).rejects.toThrow('not a project file');
+});
+
+test('rejects project.json symlinks escaping the canonical root', async () => {
+  const data = await fixture();
+  const outside = await mkdtemp(join(tmpdir(), 'framecraft-outside-'));
+  roots.push(outside);
+  await writeFile(join(outside, 'project.json'), JSON.stringify(data.project));
+  await rm(join(data.root, 'project.json'));
+  await symlink(join(outside, 'project.json'), join(data.root, 'project.json'));
+  await expect(loadStudioProject(data.root)).rejects.toThrow('project.json');
+  await expect(loadProject(data.root)).rejects.toThrow('project.json');
+});
+
+test('accepts internal manifest and scene aliases and returns canonical shot paths', async () => {
+  const data = await fixture();
+  await rename(join(data.root, 'project.json'), join(data.root, 'original-project.json'));
+  await symlink('original-project.json', join(data.root, 'project.json'));
+  await symlink('scene.json', join(data.root, 'scenes/intro/alias.json'));
+  data.project.scenes[0]!.path = 'scenes/intro/alias.json';
+  await writeFile(join(data.root, 'original-project.json'), JSON.stringify(data.project));
+  const loaded = await loadStudioProject(data.root);
+  expect(loaded.scenes[0]?.shots[0]?.entry).toBe('scenes/intro/shots/title.html');
 });
 
 test('validates each referenced scene and rejects symlinks outside the project', async () => {
@@ -135,4 +175,13 @@ test('rejects traversal and symlink escapes', async () => {
   data.shots[1]!.entry = 'shots/link.html';
   await data.save();
   expect(loadProject(data.root)).rejects.toThrow('entry');
+});
+
+test('rejects raw absolute, URL, backslash and NUL entry paths before joining', async () => {
+  const data = await fixture();
+  for (const path of ['/shots/title.html', 'https://example.org/title.html', 'shots\\title.html', 'shots/title.html\0']) {
+    data.shots[0]!.entry = path;
+    await data.save();
+    await expect(loadStudioProject(data.root)).rejects.toThrow('invalid path');
+  }
 });

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="../../../../assets/fonts/fonts.css">
+  <style>
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #f3ecd9; color: #292d29; }
+    body { font-family: "IBM Plex Sans", sans-serif; }
+    main { position: relative; height: 100%; padding: 48px 64px; box-sizing: border-box; }
+    .folio { font-size: 18px; letter-spacing: .13em; }
+    h1 { position: absolute; top: 155px; left: 65px; margin: 0; font: 400 115px/1 "IBM Plex Serif", serif; letter-spacing: -.065em; }
+    .mark { position: absolute; top: 130px; left: 605px; width: 206px; height: 206px; border-radius: 50%; background: #c75b42; transform-origin: center; }
+    .index { position: absolute; bottom: 51px; left: 66px; font-size: 21px; letter-spacing: .04em; }
+    .caption { position: absolute; bottom: 51px; right: 64px; font-size: 21px; }
+    .rule { position: absolute; left: 64px; right: 64px; bottom: 95px; height: 2px; background: #292d29; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="folio">PLATE 01 / A SINGLE IMPRESSION</div>
+    <h1>Pulse.</h1>
+    <div class="mark"></div>
+    <div class="rule"></div>
+    <div class="index">01 / 02</div>
+    <div class="caption">A point becomes a measure.</div>
+  </main>
+  <script src="../../../../runtime.js"></script>
+  <script>
+    const mark = document.querySelector('.mark');
+    const title = document.querySelector('h1');
+    window.framecraft.shot({renderFrame({progress}) {
+      mark.style.transform = `scale(${0.12 + 0.88 * progress})`;
+      title.style.opacity = String(0.6 + 0.4 * progress);
+    }});
+  </script>
+</body>
+</html>

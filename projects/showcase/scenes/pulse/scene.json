@@ -1,0 +1,17 @@
+{
+  "id": "pulse",
+  "title": "Pulse / the mark",
+  "shots": [
+    {"id": "opening", "entry": "shots/01-opening/index.html", "durationFrames": 48, "overlapFrames": 0,
+      "audio": [{"id": "tap", "src": "assets/audio/tap.wav", "startFrame": 0,
+        "durationFrames": 12, "trimOutFrames": 12, "gain": 0.45}]},
+    {"id": "echo", "entry": "shots/02-echo/index.html", "durationFrames": 48, "overlapFrames": 0,
+      "audio": [{"id": "tap", "src": "assets/audio/tap.wav", "startFrame": 6,
+        "durationFrames": 12, "trimOutFrames": 12, "gain": 0.35}]}
+  ],
+  "audio": {"schemaVersion": 1, "cues": [
+    {"id": "hum", "src": "assets/audio/hum.wav", "startFrame": 0,
+      "durationFrames": 96, "trimOutFrames": 30, "loop": true, "gain": 0.32,
+      "fadeInFrames": 6, "fadeOutFrames": 8}
+  ]}
+}

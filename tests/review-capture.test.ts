@@ -1,6 +1,6 @@
 import {expect, test} from 'bun:test';
 import {createHash} from 'node:crypto';
-import {chmod, mkdtemp, readFile, readdir, rm, stat, symlink, writeFile} from 'node:fs/promises';
+import {chmod, cp, mkdir, mkdtemp, readFile, readdir, rm, stat, symlink, writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join, resolve} from 'node:path';
 import {sourceDigest, type ReviewManifest} from '../src/review/artifacts';
@@ -100,3 +100,57 @@ test('browser launch failure retains failed review without leaving a bundle; inv
     expect(await sourceDigest(join(repo, 'projects/demo'))).toBe(sourceBefore);
   } finally { await rm(root, {recursive: true, force: true}); }
 }, 120000);
+
+test('rejects output through a symlink into a selected external project', async () => {
+  const workspace = await mkdtemp(join(tmpdir(), 'framecraft-review-external-'));
+  const project = join(workspace, 'project');
+  const alias = join(workspace, 'alias');
+  try {
+    await mkdir(join(project, 'scenes/second/shots'), {recursive: true});
+    await writeFile(join(project, 'project.json'), JSON.stringify({schemaVersion: 1, id: 'external',
+      video: {width: 2, height: 2, fps: 30}, scenes: [{id: 'second', path: 'scenes/second/scene.json'}], audio: []}));
+    await writeFile(join(project, 'scenes/second/scene.json'), JSON.stringify({id: 'second', shots: [
+      {id: 'only', entry: 'shots/only.html', durationFrames: 1, overlapFrames: 0}], audio: []}));
+    await writeFile(join(project, 'scenes/second/shots/only.html'), '<!doctype html>');
+    await symlink(project, alias);
+    const output = join(alias, 'reviews', 'capture');
+    const result = await review(['--project', project, '--scene', 'second', '--output', output]);
+    expect(result.exit).not.toBe(0);
+    expect(result.err).toContain('Output cannot be inside project');
+    await expect(stat(join(project, 'reviews'))).rejects.toThrow();
+  } finally { await rm(workspace, {recursive: true, force: true}); }
+});
+
+test('real noninitial-scene review rejects wrong selection, missing/corrupt PNGs and changed source', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'framecraft-review-showcase-'));
+  const project = join(root, 'project');
+  const output = join(root, 'review');
+  await cp(join(repo, 'projects/showcase'), project, {recursive: true});
+  const args = ['--project', project, '--scene', 'signal'];
+  try {
+    const before = await sourceDigest(project);
+    expect((await review([...args, '--output', output, '--milestone', 'receive:24'])).exit).toBe(0);
+    const path = join(output, 'manifest.json');
+    const manifest = JSON.parse(await readFile(path, 'utf8')) as ReviewManifest;
+    expect(manifest.projectId).toBe('showcase');
+    expect(manifest.sceneId).toBe('signal');
+    expect(manifest.captures).toHaveLength(7);
+    expect(manifest.captures.find(capture => capture.shotId === 'receive' && capture.localFrame === 0)?.globalFrame).toBe(48);
+    expect(manifest.review.status).toBe('unreviewed');
+    expect(manifest.source.sha256).toBe(before);
+    expect((await review([...args, '--check', path])).exit).toBe(0);
+    expect((await review(['--project', project, '--scene', 'pulse', '--check', path])).exit).not.toBe(0);
+    const screenshot = join(output, manifest.captures[0]!.path);
+    const bytes = await readFile(screenshot);
+    await rm(screenshot);
+    expect((await review([...args, '--check', path])).exit).not.toBe(0);
+    await writeFile(screenshot, 'corrupt PNG');
+    expect((await review([...args, '--check', path])).exit).not.toBe(0);
+    await writeFile(screenshot, bytes);
+    expect((await review([...args, '--check', path])).exit).toBe(0);
+    expect(await sourceDigest(project)).toBe(before);
+    const brief = join(project, 'scenes/signal/brief.md');
+    await writeFile(brief, `${await readFile(brief, 'utf8')}\nChanged after capture\n`);
+    expect((await review([...args, '--check', path])).exit).not.toBe(0);
+  } finally { await rm(root, {recursive: true, force: true}); }
+}, 180000);

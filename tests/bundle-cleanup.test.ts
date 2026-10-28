@@ -10,8 +10,9 @@ afterAll(async () => { for (const root of roots) await rm(root, {recursive: true
 test('snap removes only its own bundle after success and post-bundle failure', async () => {
   const temp = await mkdtemp(join(tmpdir(), 'framecraft-bundle-test-'));
   roots.push(temp);
+  const still = join(temp, 'title.png');
   const run = async (chromeBin?: string) => {
-    const command = Bun.spawn([process.execPath, 'run', 'snap', '--shot', 'title', '--frame', '0'], {
+    const command = Bun.spawn([process.execPath, 'run', 'snap', '--shot', 'title', '--frame', '0', '--output', still], {
       cwd: repo, env: {...process.env, TMPDIR: temp, ...(chromeBin ? {CHROME_BIN: chromeBin} : {})}, stdout: 'pipe', stderr: 'pipe',
     });
     const [exitCode, stdout, stderr] = await Promise.all([command.exited, new Response(command.stdout).text(), new Response(command.stderr).text()]);
@@ -22,7 +23,6 @@ test('snap removes only its own bundle after success and post-bundle failure', a
   const success = await run();
   expect(success.exitCode).toBe(0);
   expect(await bundles()).toEqual(before);
-  const still = resolve(repo, 'output/snaps/title-0.png');
   const previous = await readFile(still);
   const failed = await run(join(temp, 'missing-chrome'));
   expect(failed.exitCode).not.toBe(0);

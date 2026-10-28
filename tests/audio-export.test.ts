@@ -1,9 +1,9 @@
 import {expect, test} from 'bun:test';
-import {mkdtemp, readFile, readdir, rm, writeFile} from 'node:fs/promises';
+import {mkdtemp, mkdir, readFile, readdir, rm, symlink, writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join, resolve} from 'node:path';
 import {RenderInternals} from '@remotion/renderer';
-import {atomicOutput} from '../scripts/atomic-output';
+import {assertOutsideProject, atomicOutput} from '../scripts/atomic-output';
 
 const cwd = resolve(import.meta.dir, '..');
 const executable = (type: 'ffprobe' | 'ffmpeg') => RenderInternals.getExecutablePath({type, indent: false, logLevel: 'error', binariesDirectory: null});
@@ -19,7 +19,7 @@ async function run(command: string[], timeout = 240000) {
 
 async function streams(path: string) {
   const probe = await run([executable('ffprobe'), '-v', 'error', '-count_frames', '-show_entries',
-    'stream=codec_type,codec_name,width,height,r_frame_rate,nb_read_frames', '-of', 'json', path]);
+    'stream=codec_type,codec_name,width,height,r_frame_rate,nb_read_frames,duration', '-of', 'json', path]);
   expect(probe.exit).toBe(0);
   return JSON.parse(probe.out.toString()).streams as Array<Record<string, string | number>>;
 }
@@ -108,5 +108,70 @@ test('a failure after writing a partial leaves the prior target unchanged', asyn
     })).rejects.toThrow('audio encode failed');
     expect(await readFile(video, 'utf8')).toBe('previous-good-output');
     expect(await readdir(root)).toEqual(['intro.mp4']);
+  } finally { await rm(root, {recursive: true, force: true}); }
+});
+
+test('export requires a scene for multi-scene projects and accepts explicit demo selection', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'framecraft-export-scenes-'));
+  try {
+    for (const id of ['first', 'second']) {
+      await mkdir(join(root, 'scenes', id, 'shots'), {recursive: true});
+      await writeFile(join(root, 'scenes', id, 'shots', 'shared.html'), '<!doctype html>');
+      await writeFile(join(root, 'scenes', id, 'scene.json'), JSON.stringify({id, shots: [{id: 'shared', entry: 'shots/shared.html', durationFrames: 1, overlapFrames: 0}], audio: []}));
+    }
+    await writeFile(join(root, 'project.json'), JSON.stringify({schemaVersion: 1, id: 'fixture', video: {width: 640, height: 360, fps: 24}, scenes: ['first', 'second'].map(id => ({id, path: `scenes/${id}/scene.json`})), audio: []}));
+    const ambiguous = await run(['bun', 'run', 'snap', '--project', root, '--frame', '0', '--output', join(root, 'ambiguous.png')]);
+    expect(ambiguous.exit).not.toBe(0);
+    expect(ambiguous.err).toContain('scene');
+
+    const output = join(root, 'title.png');
+    const selected = await run(['bun', 'run', 'snap', '--project', 'projects/demo', '--scene', 'intro', '--shot', 'title', '--frame', '0', '--output', output]);
+    expect(selected.exit).toBe(0);
+    expect((await readFile(output)).toString('hex', 0, 8)).toBe('89504e470d0a1a0a');
+  } finally { await rm(root, {recursive: true, force: true}); }
+}, 120000);
+
+test('selected showcase scenes export only their own timed cues, and shot export omits the bed', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'framecraft-showcase-audio-'));
+  const energy = async (path: string, start: number) => {
+    const values = await samples(path, start, 0.08);
+    return Math.sqrt(values.reduce((sum, value) => sum + value * value, 0) / values.length);
+  };
+  try {
+    const paths: Record<string, string> = {};
+    for (const scene of ['pulse', 'signal']) {
+      const output = join(root, `${scene}.mp4`);
+      paths[scene] = output;
+      const result = await run(['bun', 'run', 'render', '--project', 'projects/showcase', '--scene', scene, '--output', output]);
+      expect(result.exit).toBe(0);
+      const info = await streams(output);
+      const video = info.find(stream => stream.codec_type === 'video')!;
+      expect(video).toMatchObject({codec_name: 'h264', width: 960, height: 540, r_frame_rate: '30/1', nb_read_frames: '96'});
+      expect(Number(video.duration)).toBeCloseTo(3.2, 3);
+      expect(info.find(stream => stream.codec_type === 'audio')?.codec_name).toBe('aac');
+    }
+    // The first hit is at frame 0 in pulse and frame 18 in signal.
+    expect(await energy(paths.pulse!, 0.03)).toBeGreaterThan(await energy(paths.signal!, 0.03) * 2);
+    expect(await energy(paths.signal!, 0.63)).toBeGreaterThan(await energy(paths.pulse!, 0.63) * 1.2);
+    const shot = join(root, 'carrier.mp4');
+    expect((await run(['bun', 'run', 'render', '--project', 'projects/showcase', '--scene', 'signal', '--shot', 'carrier', '--output', shot])).exit).toBe(0);
+    const shotVideo = (await streams(shot)).find(stream => stream.codec_type === 'video')!;
+    expect(shotVideo.nb_read_frames).toBe('48');
+    expect(Number(shotVideo.duration)).toBeCloseTo(1.6, 3);
+    expect(await energy(shot, 0.2)).toBeLessThan(2);
+    expect(await energy(shot, 0.63)).toBeGreaterThan(100);
+  } finally { await rm(root, {recursive: true, force: true}); }
+}, 600000);
+
+test('output guard rejects project paths and symlink aliases before writing', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'framecraft-output-guard-'));
+  try {
+    const project = join(root, 'project');
+    await mkdir(project);
+    await symlink(project, join(root, 'alias'));
+    await expect(assertOutsideProject(join(project, 'new/nested/out.png'), project)).rejects.toThrow('inside project');
+    await expect(assertOutsideProject(join(root, 'alias/new/out.json'), project)).rejects.toThrow('inside project');
+    await expect(assertOutsideProject(join(root, 'outside/out.mp4'), project)).resolves.toBeUndefined();
+    expect(await readdir(project)).toEqual([]);
   } finally { await rm(root, {recursive: true, force: true}); }
 });

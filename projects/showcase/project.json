@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "id": "showcase",
+  "title": "Signals in ink",
+  "video": {"width": 960, "height": 540, "fps": 30, "background": "#f3ecd9"},
+  "scenes": [
+    {"id": "pulse", "path": "scenes/pulse/scene.json"},
+    {"id": "signal", "path": "scenes/signal/scene.json"}
+  ],
+  "audio": []
+}

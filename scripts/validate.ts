@@ -1,6 +1,7 @@
 import {readFile, realpath} from 'node:fs/promises';
 import {dirname, isAbsolute, join, relative, resolve, sep} from 'node:path';
-import {loadProject} from '../src/spike/project';
+import {loadStudioProject} from '../src/spike/project';
+import {projectRoot, selectScene} from '../src/spike/selection';
 
 const warnings = [
   ['setInterval', /\bsetInterval\s*\(/],
@@ -13,9 +14,35 @@ const generic = new Set(['serif', 'sans-serif', 'monospace', 'cursive', 'fantasy
 const family = (value: string) => value.split(',')[0].trim().replace(/^['"]|['"]$/g, '');
 
 async function main() {
-  const root = resolve(process.argv[2] || join(import.meta.dir, '../projects/demo'));
-  const project = await loadProject(root);
-  for (const shot of project.shots) {
+  if (process.argv.slice(2).includes('--help')) {
+    console.log('Usage: bun run validate [--project <path>] [--scene <id>]\nLegacy positional project path is supported. Every scene is validated, even with --scene. Warnings are a conservative scan, not visual approval.');
+    return;
+  }
+  let rootArg: string | undefined;
+  let positional: string | undefined;
+  let sceneId: string | undefined;
+  const args = process.argv.slice(2);
+  for (let index = 0; index < args.length; index++) {
+    const flag = args[index]!;
+    if (flag === '--project' || flag === '--scene') {
+      const value = args[++index];
+      if (!value || value.startsWith('--')) throw new Error(`Missing value for ${flag}`);
+      if (flag === '--project') {
+        if (rootArg !== undefined) throw new Error('Duplicate --project');
+        rootArg = value;
+      } else {
+        if (sceneId !== undefined) throw new Error('Duplicate --scene');
+        sceneId = value;
+      }
+    } else if (!flag.startsWith('--') && positional === undefined) positional = flag;
+    else throw new Error(`Unknown argument: ${flag}`);
+  }
+  if (positional && rootArg && await projectRoot(positional) !== await projectRoot(rootArg))
+    throw new Error('Conflicting project roots');
+  const root = await projectRoot(rootArg ?? positional);
+  const project = await loadStudioProject(root);
+  if (sceneId !== undefined) selectScene(project, sceneId);
+  for (const shot of project.scenes.flatMap(scene => scene.shots)) {
     console.log(`${shot.id}: ${shot.durationFrames} frames (${shot.durationFrames / project.video.fps} seconds)`);
     const entry = join(root, shot.entry);
     const html = await readFile(entry, 'utf8');

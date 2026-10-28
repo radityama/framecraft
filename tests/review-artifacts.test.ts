@@ -114,6 +114,25 @@ test('rejects changed source and failed validation or captures even with summary
   await expect(verifyReview(path, data.root, {checkSummary: false})).rejects.toThrow('source');
 });
 
+test('verifies a selected second scene with reused shot ID and binds its source digest', async () => {
+  const data = await fixture();
+  await mkdir(join(data.root, 'scenes/second/shots'), {recursive: true});
+  await writeFile(join(data.root, 'project.json'), JSON.stringify({schemaVersion: 1, id: 'demo',
+    video: {width: 2, height: 2, fps: 30}, scenes: [
+      {id: 'intro', path: 'scenes/intro/scene.json'}, {id: 'second', path: 'scenes/second/scene.json'}], audio: []}));
+  await writeFile(join(data.root, 'scenes/second/scene.json'), JSON.stringify({id: 'second', shots: [
+    {id: 'only', entry: 'shots/only.html', durationFrames: 1, overlapFrames: 0}], audio: []}));
+  await writeFile(join(data.root, 'scenes/second/shots/only.html'), '<!doctype html><title>Second</title>');
+  data.manifest.sceneId = 'second';
+  data.manifest.source.sha256 = await sourceDigest(data.root);
+  await data.save();
+  const path = join(data.output, 'manifest.json');
+  await verifyReview(path, data.root, {sceneId: 'second'});
+  await expect(verifyReview(path, data.root, {sceneId: 'intro'})).rejects.toThrow('scene ID mismatch');
+  await writeFile(join(data.root, 'scenes/second/shots/only.html'), '<!doctype html><title>Changed</title>');
+  await expect(verifyReview(path, data.root, {sceneId: 'second'})).rejects.toThrow('source digest mismatch');
+});
+
 test('source digest includes sorted project files and link text, never external bytes', async () => {
   const data = await fixture();
   const first = await sourceDigest(data.root);

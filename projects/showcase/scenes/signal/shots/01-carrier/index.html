@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="../../../../assets/fonts/fonts.css">
+  <style>
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #292d29; color: #f3ecd9; }
+    body { font-family: "IBM Plex Sans", sans-serif; }
+    main { position: relative; height: 100%; }
+    .folio { position: absolute; left: 64px; top: 48px; font-size: 18px; letter-spacing: .13em; }
+    .antenna { position: absolute; left: 52px; top: 220px; width: 120px; height: 120px; }
+    .wave { position: absolute; left: 200px; top: 170px; width: 680px; height: 220px; overflow: hidden; }
+    svg { width: 680px; height: 220px; }
+    .label { position: absolute; left: 64px; bottom: 50px; font: 400 60px/1 "IBM Plex Serif", serif; }
+    .counter { position: absolute; right: 64px; bottom: 48px; font-size: 20px; }
+    .rule { position: absolute; left: 64px; right: 64px; bottom: 132px; height: 2px; background: #f3ecd9; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="folio">PLATE 02 / TRANSMISSION</div>
+    <img class="antenna" src="../../../../assets/antenna.svg" alt="">
+    <div class="wave"><svg viewBox="0 0 680 220" aria-hidden="true"><path d="M0 110 H68 V45 H112 V110 H180 V175 H225 V110 H298 V30 H344 V110 H412 V162 H455 V110 H525 V55 H571 V110 H680" fill="none" stroke="#c75b42" stroke-width="7" stroke-linejoin="round"/></svg></div>
+    <div class="rule"></div>
+    <div class="label">On the wire</div>
+    <div class="counter">CH / 01</div>
+  </main>
+  <script src="../../../../runtime.js"></script>
+  <script>
+    const wave = document.querySelector('.wave');
+    const counter = document.querySelector('.counter');
+    window.framecraft.shot({renderFrame({frame, progress}) {
+      wave.style.width = `${16 + 664 * progress}px`;
+      counter.textContent = `CH / ${String(frame + 1).padStart(2, '0')}`;
+    }});
+  </script>
+</body>
+</html>

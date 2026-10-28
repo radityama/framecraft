@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="../../../../assets/fonts/fonts.css">
+  <style>
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #f3ecd9; color: #292d29; }
+    body { font-family: "IBM Plex Sans", sans-serif; }
+    main { position: relative; height: 100%; }
+    .folio { position: absolute; left: 64px; top: 48px; font-size: 18px; letter-spacing: .13em; }
+    .origin { position: absolute; top: 249px; left: 469px; width: 22px; height: 22px; border-radius: 50%; background: #c75b42; }
+    .ring { position: absolute; left: 480px; top: 260px; width: 100px; height: 100px; box-sizing: border-box; border: 4px solid #c75b42; border-radius: 50%; transform: translate(-50%, -50%) scale(.1); }
+    .count { position: absolute; right: 63px; bottom: 37px; font: 400 76px/1 "IBM Plex Serif", serif; }
+    .label { position: absolute; left: 64px; bottom: 49px; font-size: 22px; }
+    .rule { position: absolute; left: 64px; right: 64px; bottom: 118px; height: 2px; background: #292d29; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="folio">PLATE 01 / PROPAGATION</div>
+    <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+    <div class="origin"></div>
+    <div class="rule"></div>
+    <div class="label">Distance from the source</div>
+    <div class="count">00</div>
+  </main>
+  <script src="../../../../runtime.js"></script>
+  <script>
+    const rings = document.querySelectorAll('.ring');
+    const count = document.querySelector('.count');
+    window.framecraft.shot({renderFrame({frame, progress}) {
+      rings.forEach((ring, index) => {
+        const radius = Math.max(0.12, 0.12 + 3.5 * progress - index * 0.75);
+        ring.style.transform = `translate(-50%, -50%) scale(${radius})`;
+        ring.style.opacity = String(Math.max(0, 0.9 - index * 0.18 - progress * 0.22));
+      });
+      count.textContent = String(frame).padStart(2, '0');
+    }});
+  </script>
+</body>
+</html>

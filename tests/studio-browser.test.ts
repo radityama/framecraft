@@ -1,61 +1,28 @@
 import {afterAll, beforeAll, expect, test} from 'bun:test';
-import {bundle} from '@remotion/bundler';
 import {chromium, type Browser, type Page} from 'playwright-core';
-import {mkdtemp, rm, realpath} from 'node:fs/promises';
-import {tmpdir} from 'node:os';
-import {join, resolve, isAbsolute, relative, sep} from 'node:path';
-import {loadStudioProject} from '../src/spike/project';
+import {resolve} from 'node:path';
+import {startStudio} from './fixtures/studio-server';
 
-const root = resolve(import.meta.dir, '../projects/demo');
 let browser: Browser;
-let server: ReturnType<typeof Bun.serve>;
-let serverRoot: string;
-let bundleDir: string;
+let studio: Awaited<ReturnType<typeof startStudio>>;
 
 beforeAll(async () => {
-  bundleDir = await mkdtemp(join(tmpdir(), 'framecraft-studio-browser-'));
-  serverRoot = join(bundleDir, 'studio');
-  await bundle({
-    entryPoint: resolve(import.meta.dir, '../src/studio/main.tsx'),
-    publicDir: root,
-    outDir: serverRoot,
-    ignoreRegisterRootWarning: true,
-  });
-  server = Bun.serve({
-    hostname: '127.0.0.1',
-    port: 0,
-    async fetch(request) {
-      const url = new URL(request.url);
-      if (url.pathname === '/api/project') {
-        return Response.json(await loadStudioProject(root));
-      }
-      const pathname = decodeURIComponent(url.pathname === '/' ? '/index.html' : url.pathname);
-      const target = resolve(serverRoot, `.${pathname}`);
-      const rel = relative(serverRoot, target);
-      if (rel === '..' || rel.startsWith(`..${sep}`) || isAbsolute(rel)) return new Response('Forbidden', {status: 403});
-      const real = await realpath(target).catch(() => '');
-      const base = await realpath(serverRoot);
-      const realRel = relative(base, real);
-      if (!real || realRel === '..' || realRel.startsWith(`..${sep}`) || isAbsolute(realRel)) return new Response('Not found', {status: 404});
-      const file = Bun.file(real);
-      return await file.exists() ? new Response(file) : new Response('Not found', {status: 404});
-    },
-  });
-  browser = await chromium.launch({executablePath: resolve(import.meta.dir, '../node_modules/.remotion/chrome-headless-shell/linux64/chrome-headless-shell-linux64/chrome-headless-shell')});
+  studio = await startStudio();
+  browser = await chromium.launch({executablePath: process.env.CHROME_BIN || resolve(import.meta.dir, '../node_modules/.remotion/chrome-headless-shell/linux64/chrome-headless-shell-linux64/chrome-headless-shell')});
 }, 120000);
 
 afterAll(async () => {
   await browser?.close();
-  server?.stop(true);
-  if (bundleDir) await rm(bundleDir, {recursive: true, force: true});
+  await studio?.stop();
 });
 
-const url = (path = '/') => `http://127.0.0.1:${server.port}${path}`;
+const url = (path = '/') => `${studio.url}${path}`;
 
 async function open(path: string) {
   const page = await browser.newPage({viewport: {width: 1440, height: 900}});
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
+  page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
   await page.goto(url(path));
   return {page, errors};
 }
@@ -77,6 +44,8 @@ async function seek(page: Page, frame: number) {
 test('seeks across shot boundaries and matches the renderer at repeated frames', async () => {
   const {page, errors} = await open('/?clip=intro');
   try {
+    await ready(page, 0);
+    await page.getByRole('button', {name: /title 60f/}).click();
     await ready(page, 0);
     expect(await stage(page).getAttribute('data-shot')).toBe('title');
 
@@ -224,64 +193,133 @@ test('audio follows seek, pause, replay and scene switch', async () => {
   } finally { await page.close(); }
 }, 120000);
 
-test('keeps the scene in the URL, recovers from an invalid clip, and switches scene cleanly', async () => {
+test('real catalog project/scene/shot navigation survives refresh and history without stale media', async () => {
   const page = await browser.newPage({viewport: {width: 1440, height: 900}});
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
-  const second = {
-    id: 'second',
-    title: 'Second scene',
-    shots: [{id: 'title', entry: 'scenes/intro/shots/01-title/index.html', durationFrames: 30, startFrame: 0, audio: []}],
-    durationFrames: 30,
-    audio: [],
-  };
-  const manifest = await (await fetch(url('/api/project'))).json() as {scenes: unknown[]};
-  await page.route('**/api/project', route => route.fulfill({json: {...manifest, scenes: [...manifest.scenes, second]}}));
   try {
     await page.goto(url('/?clip=intro'));
     await ready(page, 0);
-    expect(await page.locator('select').inputValue()).toBe('intro');
+    expect(await page.getByLabel('Project', {exact: true}).inputValue()).toBe('demo');
+    expect(await page.getByLabel('Scene', {exact: true}).inputValue()).toBe('intro');
 
     await seek(page, 78);
     expect(await page.locator('audio[src*="assets/audio/"]').count()).toBeGreaterThanOrEqual(2);
-    await page.locator('select').selectOption('second');
-    await page.waitForFunction(() => document.querySelector('#stage')?.getAttribute('data-scene') === 'second' && document.querySelector('#stage')?.getAttribute('data-state') === 'ready', undefined, {timeout: 30000});
-    expect(await page.locator('audio[src*="assets/audio/"]').count()).toBe(0);
-    expect(new URL(page.url()).search).toBe('?clip=second');
+    await page.getByLabel('Project', {exact: true}).selectOption('showcase');
+    await ready(page, 0);
+    expect(await stage(page).getAttribute('data-project')).toBe('showcase');
+    expect(await page.frameLocator('iframe').locator('h1').evaluate(node => Number(getComputedStyle(node).opacity))).toBeGreaterThanOrEqual(0.6);
+    expect(await page.locator('audio[src*="/demo/"]').count()).toBe(0);
+    await page.getByLabel('Scene', {exact: true}).selectOption('signal');
+    await ready(page, 0);
+    expect(await stage(page).getAttribute('data-scene')).toBe('signal');
+    await page.getByRole('button', {name: /receive/}).click();
+    await ready(page, 48);
+    expect(new URL(page.url()).search).toBe('?project=showcase&scene=signal&shot=receive');
+    expect(await page.frameLocator('iframe').locator('h1').evaluate(node => Number(getComputedStyle(node).opacity))).toBeGreaterThanOrEqual(0.6);
     expect(await page.locator('iframe').count()).toBe(1);
-    expect(await page.locator('#stage').getAttribute('data-frame')).toBe('0');
+    expect(await page.locator('#stage').getAttribute('data-frame')).toBe('48');
 
     await page.reload();
-    await ready(page, 0);
-    expect(await page.locator('select').inputValue()).toBe('second');
+    await ready(page, 48);
+    expect(await page.getByLabel('Scene', {exact: true}).inputValue()).toBe('signal');
     expect(await page.locator('iframe').count()).toBe(1);
+    await page.goBack();
+    await ready(page, 0);
+    expect(await stage(page).getAttribute('data-shot')).toBe('carrier');
+    await page.goBack();
+    await ready(page, 0);
+    expect(await stage(page).getAttribute('data-scene')).toBe('pulse');
+    await page.goForward();
+    await ready(page, 0);
+    expect(await stage(page).getAttribute('data-scene')).toBe('signal');
     expect(errors).toEqual([]);
 
     await page.goto(url('/?clip=nope'));
     await page.getByRole('heading', {name: /Unknown scene "nope"/}).waitFor({timeout: 10000});
     await page.getByRole('button', {name: 'Open intro'}).click();
     await ready(page, 0);
-    expect(new URL(page.url()).search).toBe('?clip=intro');
+    expect(new URL(page.url()).search).toBe('?project=demo&scene=intro&shot=title');
   } finally {
     await page.close();
   }
 }, 150000);
 
+test('CLI-selected noninitial scene initializes UI and explicit URL IDs take precedence', async () => {
+  const selected = await startStudio(['--project', 'projects/showcase', '--scene', 'signal']);
+  const page = await browser.newPage();
+  const errors: string[] = [];
+  page.on('pageerror', error => errors.push(error.message));
+  try {
+    await page.goto(selected.url);
+    await ready(page, 0);
+    expect(await stage(page).getAttribute('data-project')).toBe('showcase');
+    expect(await page.getByLabel('Scene', {exact: true}).inputValue()).toBe('signal');
+    expect(new URL(page.url()).search).toBe('?project=showcase&scene=signal&shot=carrier');
+    await page.reload();
+    await ready(page, 0);
+    await page.goto(`${selected.url}/?project=demo&scene=intro&shot=diagram`);
+    await ready(page, 60);
+    expect(await stage(page).getAttribute('data-project')).toBe('demo');
+    await page.goto(`${selected.url}/?project=showcase&clip=signal&shot=receive`);
+    await ready(page, 48);
+    expect(new URL(page.url()).search).toBe('?project=showcase&scene=signal&shot=receive');
+    expect(errors).toEqual([]);
+  } finally { await page.close(); await selected.stop(); }
+}, 180000);
+
+test('invalid and conflicting URL selectors show a recoverable error, never a fallback preview', async () => {
+  const page = await browser.newPage();
+  try {
+    for (const query of ['project=unknown', 'project=..%2Fdemo', 'project=demo&project=showcase', 'scene=intro&clip=signal', 'project=showcase&scene=signal&shot=missing']) {
+      await page.goto(url(`/?${query}`));
+      await page.getByRole('alert').waitFor();
+      expect(await page.locator('iframe').count()).toBe(0);
+      await page.getByRole('button', {name: /^Open /}).first().click();
+      await ready(page, 0);
+    }
+  } finally { await page.close(); }
+}, 180000);
+
+test('an aborted old project response cannot overwrite the newer selection', async () => {
+  const page = await browser.newPage();
+  let release!: () => void;
+  let intercepted!: () => void;
+  const held = new Promise<void>(resolve => { release = resolve; });
+  const started = new Promise<void>(resolve => { intercepted = resolve; });
+  await page.route('**/api/project?id=demo', async route => {
+    intercepted();
+    await held;
+    await route.continue().catch(() => {});
+  });
+  try {
+    await page.goto(url(), {waitUntil: 'domcontentloaded'});
+    await started;
+    await page.getByLabel('Project', {exact: true}).selectOption('showcase');
+    await ready(page, 0);
+    release();
+    await seek(page, 24);
+    expect(await stage(page).getAttribute('data-project')).toBe('showcase');
+    expect(await page.getByLabel('Project', {exact: true}).inputValue()).toBe('showcase');
+    expect(await page.locator('audio[src*="/demo/"]').count()).toBe(0);
+  } finally { release(); await page.close(); }
+}, 90000);
+
 test('shows loading, empty, error, and runtime failure states', async () => {
   const {page} = await open('/?clip=intro');
   try {
-    await page.route('**/api/project', route => route.fulfill({json: {id: 'demo', title: 'Renderer trial', video: {width: 1920, height: 1080, fps: 30}, scenes: []}}));
+    await page.route('**/api/project?*', route => route.fulfill({json: {id: 'demo', title: 'Renderer trial', video: {width: 1920, height: 1080, fps: 30}, scenes: []}}));
     await page.goto(url('/'));
     await page.getByText('This project has no scenes.').waitFor({timeout: 10000});
 
-    await page.route('**/api/project', route => route.fulfill({status: 500, json: {error: 'Manifest is broken'}}));
+    await page.route('**/api/project?*', route => route.fulfill({status: 500, json: {error: 'Manifest is broken'}}));
     await page.goto(url('/'));
     await page.getByText('Could not load the project: Manifest is broken').waitFor({timeout: 10000});
-    await page.unroute('**/api/project');
+    await page.unroute('**/api/project?*');
     await page.getByRole('button', {name: 'Retry loading'}).click();
     await ready(page, 0);
 
-    await page.route('**/public/scenes/intro/shots/02-diagram/index.html', route => route.fulfill({
+    await page.route('**/public/demo/scenes/intro/shots/02-diagram/index.html', route => route.fulfill({
       status: 200,
       contentType: 'text/html',
       body: '<!doctype html><script src="/public/runtime.js"></script><script>framecraft.shot({renderFrame() { throw new Error("Shot exploded"); }});</script>',
@@ -289,16 +327,52 @@ test('shows loading, empty, error, and runtime failure states', async () => {
     await page.locator('input[type=range]').fill('60');
     await page.getByRole('alert').getByText(/Shot exploded/).waitFor({timeout: 30000});
     expect(await stage(page).getAttribute('data-state')).toBe('error');
+    await page.unroute('**/public/demo/scenes/intro/shots/02-diagram/index.html');
+    await page.getByRole('button', {name: 'Retry frame'}).click();
+    await ready(page, 60);
+    expect(await stage(page).getAttribute('data-shot')).toBe('diagram');
   } finally {
     await page.close();
   }
 }, 120000);
 
+test('catalog errors, empty state and skipped-project disclosure are keyboard recoverable', async () => {
+  const page = await browser.newPage();
+  try {
+    await page.route('**/api/projects', route => route.fulfill({status: 500, json: {error: 'Catalog unavailable'}}));
+    await page.goto(url());
+    await page.getByRole('alert').getByText(/Catalog unavailable/).waitFor();
+    await page.unroute('**/api/projects');
+    await page.getByRole('button', {name: 'Retry loading'}).click();
+    await ready(page, 0);
+    await page.route('**/api/projects', route => route.fulfill({json: {projects: [], warnings: [], selected: {projectId: 'demo', sceneId: 'intro'}}}));
+    await page.goto(url());
+    await page.getByText(/No projects available/).waitFor();
+    await page.unroute('**/api/projects');
+    await page.getByRole('button', {name: 'Retry loading'}).click();
+    await ready(page, 0);
+    await page.route('**/api/projects', async route => {
+      const response = await route.fetch();
+      await route.fulfill({json: {...await response.json(), warnings: ['invalid-fixture: invalid project (run validate for details)']}});
+    });
+    await page.goto(url());
+    await ready(page, 0);
+    const disclosure = page.getByText('Some projects were skipped (1)');
+    await disclosure.focus();
+    await page.keyboard.press('Enter');
+    await page.getByText(/invalid-fixture:/).waitFor({state: 'visible'});
+    expect(await page.locator('details').getAttribute('open')).not.toBeNull();
+    const fonts = await page.evaluate(() => Array.from(document.fonts).filter(font => font.status === 'loaded').map(font => font.family));
+    expect(fonts).toContain('IBM Plex Sans');
+    expect(fonts).toContain('JetBrains Mono');
+  } finally { await page.close(); }
+}, 90000);
+
 test('reports a missing image asset instead of displaying an acknowledged frame', async () => {
   const {page} = await open('/?clip=intro');
   try {
     await ready(page, 0);
-    await page.route('**/public/scenes/intro/shots/02-diagram/index.html', route => route.fulfill({
+    await page.route('**/public/demo/scenes/intro/shots/02-diagram/index.html', route => route.fulfill({
       contentType: 'text/html',
       body: '<!doctype html><img src="/public/missing-preview-image.png"><script src="/public/runtime.js"></script><script>framecraft.shot({renderFrame() {}});</script>',
     }));

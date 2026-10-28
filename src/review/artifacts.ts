@@ -3,7 +3,8 @@ import {constants} from 'node:fs';
 import {open, readdir, readFile, readlink, realpath, stat} from 'node:fs/promises';
 import {dirname, isAbsolute, join, relative, sep} from 'node:path';
 import {RenderInternals} from '@remotion/renderer';
-import {loadProject} from '../spike/project';
+import {loadStudioProject} from '../spike/project';
+import {selectScene} from '../spike/selection';
 import {SELECTION_POLICY, selectReviewFrames, type ReviewFrame} from './frames';
 
 export type ReviewCapture = ReviewFrame & ({status: 'captured'; sha256: string} | {status: 'failed'; error: string});
@@ -178,17 +179,15 @@ export function summaryText(manifest: ReviewManifest): string {
 }
 
 export async function verifyReview(manifestPath: string, projectRoot: string,
-  options: {checkSummary?: boolean} = {}): Promise<void> {
+  options: {checkSummary?: boolean; sceneId?: string} = {}): Promise<void> {
   const manifest = parseManifest(JSON.parse(await readFile(manifestPath, 'utf8')));
-  const project = await loadProject(projectRoot);
-  const projectJson = JSON.parse(await readFile(join(projectRoot, 'project.json'), 'utf8')) as {
-    id: string; scenes: Array<{id: string}>;
-  };
-  if (manifest.projectId !== projectJson.id || manifest.sceneId !== projectJson.scenes[0]?.id)
+  const project = await loadStudioProject(projectRoot);
+  if (manifest.projectId !== project.id || (options.sceneId !== undefined && manifest.sceneId !== options.sceneId))
     throw new Error('project or scene ID mismatch');
+  const scene = selectScene(project, manifest.sceneId);
   for (const key of ['width', 'height', 'fps'] as const)
     if (manifest.environment.video[key] !== project.video[key]) throw new Error(`video ${key} mismatch`);
-  const expected = selectReviewFrames(project.shots, manifest.selection.milestones);
+  const expected = selectReviewFrames(scene.shots, manifest.selection.milestones);
   if (manifest.captures.length !== expected.length) throw new Error('capture frame count mismatch');
   const directory = await realpath(dirname(manifestPath));
   for (const [index, frame] of expected.entries()) {

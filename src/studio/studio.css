@@ -1,3 +1,5 @@
+@import url('../../projects/demo/assets/fonts/fonts.css');
+
 :root {
   --ground: #171719;
   --surface: #131217;
@@ -62,12 +64,13 @@ button:active { background: #323136; }
 .identity h1 { margin: 0; font-size: 18px; font-weight: 600; letter-spacing: -0.01em; }
 .identity p { margin: 2px 0 0; font-size: 13px; }
 .format { margin-left: auto; color: var(--muted); font-size: 12px; }
-.scene-picker { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; }
+.scene-picker { display: flex; align-items: center; gap: 8px; min-width: 0; color: var(--muted); font-size: 12px; }
 select {
   background: var(--raised);
   border: 0;
   border-radius: 0;
   min-height: 34px;
+  max-width: 100%;
   padding: 0 10px;
   font-size: 13px;
 }
@@ -176,7 +179,8 @@ select {
 .studio-message code { font-family: var(--mono); font-size: 12px; }
 
 .fault { background: var(--surface); padding: 24px; display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
-.fault h2 { margin: 0; font-size: 16px; }
+.fault h2 { margin: 0; font-size: 16px; overflow-wrap: anywhere; }
+.fault summary { cursor: pointer; padding: 12px 0; min-height: 44px; }
 .fault p { margin: 0; color: var(--muted); }
 .fault-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
@@ -193,6 +197,7 @@ select {
   .track { height: 44px; }
   .scene-picker { width: 100%; flex-direction: column; align-items: stretch; gap: 4px; }
   select { min-height: 44px; width: 100%; }
+  button { min-height: 44px; }
   .transport button { min-height: 44px; }
   .timecode { margin-left: 0; width: 100%; }
   .shots ol { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); overflow: visible; }

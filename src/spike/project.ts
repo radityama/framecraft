@@ -34,8 +34,12 @@ function inside(base: string, target: string): boolean {
   return rel !== '' && rel !== '..' && !rel.startsWith(`..${sep}`) && !isAbsolute(rel);
 }
 
+function localPath(path: unknown, field: string): asserts path is string {
+  if (typeof path !== 'string' || !path || isAbsolute(path) || /[\\\0?#]|^[a-z][a-z0-9+.-]*:/i.test(path)) throw new Error(`${field}: invalid path`);
+}
+
 async function entry(base: string, path: unknown, field: string): Promise<string> {
-  if (typeof path !== 'string' || !path || isAbsolute(path)) throw new Error(`${field}: invalid path`);
+  localPath(path, field);
   const resolved = join(base, path);
   if (!inside(base, resolved)) throw new Error(`${field}: path escapes project: ${path}`);
   let actual: string;
@@ -47,7 +51,8 @@ async function entry(base: string, path: unknown, field: string): Promise<string
 
 async function loadValidatedProject(root: string, singleScene: boolean): Promise<StudioProject> {
   const base = await realpath(root);
-  const project = object(JSON.parse(await readFile(join(base, 'project.json'), 'utf8')), 'project');
+  const manifestPath = await entry(base, 'project.json', 'project.json');
+  const project = object(JSON.parse(await readFile(join(base, manifestPath), 'utf8')), 'project');
   if (project.schemaVersion !== 1) throw new Error('project.schemaVersion must be 1');
   const projectId = id(project.id, 'project.id');
   const video = object(project.video, 'project.video');
@@ -78,7 +83,7 @@ async function loadValidatedProject(root: string, singleScene: boolean): Promise
       ids.add(shotId);
       const duration = positive(shot.durationFrames, `shot ${shotId}.durationFrames`);
       if (shot.overlapFrames !== 0) throw new Error(`shot ${shotId}.overlapFrames must be 0`);
-      if (typeof shot.entry !== 'string' || !shot.entry) throw new Error(`shot ${shotId}.entry: invalid path`);
+      localPath(shot.entry, `shot ${shotId}.entry`);
       const shotEntry = await entry(base, join(relative(base, sceneDir), shot.entry), `shot ${shotId}.entry`);
       if (!shotEntry.endsWith('.html')) throw new Error(`shot ${shotId}.entry must be HTML`);
       shots.push({id: shotId, entry: shotEntry, durationFrames: duration, startFrame: durationFrames, audio: []});

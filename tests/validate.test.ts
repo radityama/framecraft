@@ -58,3 +58,26 @@ test('validate distinguishes local declared and generic fonts from missing faces
   expect(clean.exitCode).toBe(0);
   expect(clean.output).not.toContain('warning [');
 });
+
+test('validates every scene even when a different scene is selected', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'framecraft-validate-scenes-'));
+  roots.push(root);
+  for (const id of ['first', 'second']) await mkdir(join(root, `scenes/${id}/shots`), {recursive: true});
+  await writeFile(join(root, 'project.json'), JSON.stringify({schemaVersion: 1, id: 'fixture',
+    video: {width: 1920, height: 1080, fps: 30}, scenes: ['first', 'second'].map(id => ({id, path: `scenes/${id}/scene.json`})), audio: []}));
+  for (const id of ['first', 'second']) {
+    await writeFile(join(root, `scenes/${id}/scene.json`), JSON.stringify({id, shots: [
+      {id: 'shared', entry: 'shots/shared.html', durationFrames: 30, overlapFrames: 0}], audio: []}));
+    await writeFile(join(root, `scenes/${id}/shots/shared.html`), id === 'first'
+      ? '<link rel="stylesheet" href="missing.css">' : '<!doctype html>');
+  }
+  const result = validate('scripts/validate.ts', '--project', root, '--scene', 'second');
+  expect(result.exitCode).not.toBe(0);
+  expect(result.output).toContain('missing.css');
+  expect(validate('scripts/validate.ts', '--project', root, '--scene', 'missing').exitCode).not.toBe(0);
+  expect(validate('scripts/validate.ts', root, '--project', resolve('projects/demo')).output).toContain('Conflicting project roots');
+  await writeFile(join(root, 'scenes/first/shots/shared.html'), '<!doctype html>');
+  const clean = validate('scripts/validate.ts', '--project', root, '--scene', 'second');
+  expect(clean.exitCode).toBe(0);
+  expect(clean.output.match(/shared: 30 frames/g)).toHaveLength(2);
+});

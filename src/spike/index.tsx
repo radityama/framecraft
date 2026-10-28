@@ -1,30 +1,35 @@
 import React from 'react';
 import {Composition, registerRoot} from 'remotion';
-import project from '../../projects/demo/project.json';
-import scene from '../../projects/demo/scenes/intro/scene.json';
-import {resolveAudioTimeline} from './audio';
 import {SceneComposition} from './composition';
-import type {Shot} from './project';
+import type {Scene, Shot, StudioProject} from './project';
 
-const {width, height, fps} = project.video;
-let offset = 0;
-const rawShots = scene.shots.map(shot => {
-  const result = {...shot, entry: `${project.scenes[0]!.path.replace(/\/[^/]+$/, '')}/${shot.entry}`,
-    startFrame: offset, audio: 'audio' in shot ? shot.audio : []};
-  offset += shot.durationFrames;
-  return result;
-});
-const resolved = resolveAudioTimeline(scene.audio, rawShots, offset);
-const shots: Shot[] = rawShots.map(shot => ({id: shot.id, entry: shot.entry, startFrame: shot.startFrame,
-  durationFrames: shot.durationFrames, audio: resolved.shotCues[shot.id]!}));
+type Props = {scene: Scene; video: StudioProject['video']; shotId?: string};
 
-const Intro = () => <SceneComposition shots={shots} video={project.video} audio={resolved.cues} />;
-const Scoped = ({shot}: {shot: Shot}) => <SceneComposition shots={[{...shot, startFrame: 0}]}
-  video={project.video} audio={shot.audio} />;
+const defaults: Props = {
+  scene: {id: 'intro', title: 'intro', durationFrames: 1, audio: [], shots: [
+    {id: 'title', entry: 'scenes/intro/shots/01-title/index.html', startFrame: 0, durationFrames: 1, audio: []},
+  ]},
+  video: {width: 1920, height: 1080, fps: 30},
+};
+
+function selectedShot({scene, shotId}: Props): Shot {
+  const shot = scene.shots.find(item => item.id === shotId);
+  if (!shot) throw new Error(`Unknown shot: ${shotId ?? '(missing)'}`);
+  return shot;
+}
+
+const SceneView = ({scene, video}: Props) => <SceneComposition shots={scene.shots} video={video} audio={scene.audio} />;
+const ShotView = (props: Props) => {
+  const shot = selectedShot(props);
+  return <SceneComposition shots={[{...shot, startFrame: 0}]} video={props.video} audio={shot.audio} />;
+};
+
 const Root = () => <>
-  <Composition id="intro" component={Intro} durationInFrames={offset} fps={fps} width={width} height={height} />
-  {shots.map(shot => <Composition key={shot.id} id={shot.id} component={Scoped}
-    durationInFrames={shot.durationFrames} fps={fps} width={width} height={height} defaultProps={{shot}} />)}
+  <Composition id="scene" component={SceneView} durationInFrames={1} fps={30} width={1920} height={1080}
+    defaultProps={defaults} calculateMetadata={({props}) => ({durationInFrames: props.scene.durationFrames, ...props.video})} />
+  <Composition id="shot" component={ShotView} durationInFrames={1} fps={30} width={1920} height={1080}
+    defaultProps={{...defaults, shotId: 'title'}}
+    calculateMetadata={({props}) => ({durationInFrames: selectedShot(props).durationFrames, ...props.video})} />
 </>;
 
 registerRoot(Root);
