@@ -1,0 +1,443 @@
+{
+  "brief": {
+    "schemaVersion": 1,
+    "projectId": "production-desktop",
+    "sceneId": "desk",
+    "audience": "Viewers evaluating whether Framecraft can depict a credible, quiet desktop task with causal motion and local tactile sound.",
+    "message": "Small, deliberate actions make a working space feel settled.",
+    "format": "desktop-simulation",
+    "references": [
+      "Original exercise, not a client product. Observe conventional desktop title bars, focused rename fields, active-window stacking and cursor-to-window grip geometry; do not clone a branded OS."
+    ],
+    "narrative": "Establish a working desktop, create and name a folder, move its window with an attached hand cursor, then settle the camera and hold the result.",
+    "constraints": [
+      "A labeled desktop simulation, not a working application or product claim.",
+      "No remote assets, narration or music.",
+      "Exact frame-driven states and variable typing cadence.",
+      "Subjective listening remains pending if unavailable; no automatic human approval."
+    ],
+    "design": {
+      "palette": [
+        "Warm paper #ebe8df for a quiet desk",
+        "Ink #252d2c for readable structure",
+        "Muted rust #a14323 only for active focus"
+      ],
+      "typography": "Local IBM Plex Sans for familiar, legible task controls; IBM Plex Serif for the two short editorial statements, adding a quiet printed-desk character. ENERGY 1 / RHYTHM 2 / MOTION 2.",
+      "composition": "A persistent desktop with menu bar, overlapping windows, sidebar, file table and restrained elevation. The active window is the focal plane; no floating feature cards. The caption occupies the clear lower margin, outside the camera crop.",
+      "motion": "Approach and settle before a press; release causes folder creation and focus. Variable key cadence resolves before confirmation. Preserve the title-bar grip throughout drag, release before the drop accent, and make one restrained camera move followed by a long reading hold."
+    },
+    "audio": {
+      "sfx": "required",
+      "silenceReason": null,
+      "narration": {
+        "enabled": false,
+        "authorization": null
+      },
+      "music": {
+        "enabled": false,
+        "authorization": null
+      }
+    },
+    "review": {
+      "humanApprovalRequired": false
+    }
+  },
+  "plan": {
+    "schemaVersion": 1,
+    "projectId": "production-desktop",
+    "sceneId": "desk",
+    "beats": [
+      {
+        "id": "orient",
+        "shotId": "workspace",
+        "startFrame": 0,
+        "endFrame": 54,
+        "script": "Start with a little order.",
+        "visual": "An active file window sits in front of a reference window on a coherent desktop.",
+        "motion": "The arrow travels on a curved, decelerating approach, then settles over New folder.",
+        "rationale": "Establish task geometry before acting; the pointer should not compete with reading."
+      },
+      {
+        "id": "create",
+        "shotId": "workspace",
+        "startFrame": 54,
+        "endFrame": 96,
+        "script": "Give an idea a home.",
+        "visual": "Press darkens New folder. Release creates a selected rename field.",
+        "motion": "A brief press, distinct release and visible focus precede typing.",
+        "rationale": "The consequence follows the input, not an arbitrary reveal timer."
+      },
+      {
+        "id": "name",
+        "shotId": "workspace",
+        "startFrame": 96,
+        "endFrame": 174,
+        "script": "Field notes.",
+        "visual": "Eleven characters form Field notes inside the focused field; confirmation ends editing.",
+        "motion": "Variable key cadence, then a readable pause and confirmation.",
+        "rationale": "Typing is an intentional task with focus, cadence and resolution."
+      },
+      {
+        "id": "grip",
+        "shotId": "workspace",
+        "startFrame": 174,
+        "endFrame": 220,
+        "script": "Make a little room.",
+        "visual": "The pointer approaches the title bar and changes to an open hand before contact.",
+        "motion": "Curved approach, settle, press, grip and short preparation before the drag.",
+        "rationale": "Show the intended handle and contact before moving a large object."
+      },
+      {
+        "id": "move",
+        "shotId": "workspace",
+        "startFrame": 220,
+        "endFrame": 304,
+        "script": "Move, release, settle.",
+        "visual": "The front window follows the hand without changing its grip offset or losing stacking.",
+        "motion": "Ease into the drag and stop before release; a small drop accent follows the released contact.",
+        "rationale": "A window is not an elastic card. Its movement belongs to the pointer."
+      },
+      {
+        "id": "resolve",
+        "shotId": "workspace",
+        "startFrame": 304,
+        "endFrame": 450,
+        "script": "A little room to think.",
+        "visual": "The folder remains selected in a settled workspace. The closing caption has a long reading hold.",
+        "motion": "One 2.5% motivated camera move settles by 348; closing type resolves by 370.",
+        "rationale": "Direct attention to the finished task without cropping menu text, then stop moving and let the viewer read."
+      }
+    ],
+    "events": [
+      {
+        "id": "press-new",
+        "beatId": "create",
+        "shotId": "workspace",
+        "frame": 54,
+        "type": "press",
+        "detail": "Cursor hotspot is inside New folder; button darkens only while pressed.",
+        "audio": {
+          "intent": "required",
+          "cueId": "open-press",
+          "reason": "Dry light mechanical down-contact, not a notification."
+        }
+      },
+      {
+        "id": "release-new",
+        "beatId": "create",
+        "shotId": "workspace",
+        "frame": 57,
+        "type": "release",
+        "detail": "Release removes pressed state and creates the new folder.",
+        "audio": {
+          "intent": "required",
+          "cueId": "open-release",
+          "reason": "A thinner, distinct up-contact follows the visible release."
+        }
+      },
+      {
+        "id": "rename-focus",
+        "beatId": "create",
+        "shotId": "workspace",
+        "frame": 57,
+        "type": "focus",
+        "detail": "New folder's selected name receives a rust focus outline.",
+        "audio": {
+          "intent": "silent",
+          "cueId": null,
+          "reason": "The release already conveys causality; another focus chime would be redundant."
+        }
+      },
+      {
+        "id": "type-name",
+        "beatId": "name",
+        "shotId": "workspace",
+        "frame": 96,
+        "type": "type",
+        "detail": "Keys at 96,100,105,110,116,120,125,130,134,140,145 reveal Field notes.",
+        "audio": {
+          "intent": "required",
+          "cueId": "typing",
+          "reason": "Eleven original varied key contacts share the exact visual cadence."
+        }
+      },
+      {
+        "id": "name-complete",
+        "beatId": "name",
+        "shotId": "workspace",
+        "frame": 145,
+        "type": "reveal",
+        "detail": "The final character is visible before confirmation.",
+        "audio": {
+          "intent": "silent",
+          "cueId": null,
+          "reason": "The last contact is already part of the mapped typing performance."
+        }
+      },
+      {
+        "id": "confirm-name",
+        "beatId": "name",
+        "shotId": "workspace",
+        "frame": 159,
+        "type": "confirm",
+        "detail": "Confirmation clears the edit outline and caret while retaining folder selection.",
+        "audio": {
+          "intent": "required",
+          "cueId": "confirm",
+          "reason": "A slightly lower keyboard contact resolves the naming action."
+        }
+      },
+      {
+        "id": "press-title",
+        "beatId": "grip",
+        "shotId": "workspace",
+        "frame": 212,
+        "type": "press",
+        "detail": "Hand hotspot is at title-bar local 550,30; pressed state begins.",
+        "audio": {
+          "intent": "required",
+          "cueId": "grip-press",
+          "reason": "A separate original down-contact, not a repeat of the first click."
+        }
+      },
+      {
+        "id": "grab-title",
+        "beatId": "grip",
+        "shotId": "workspace",
+        "frame": 214,
+        "type": "grab",
+        "detail": "Pressed hand retains the active foreground window and establishes its grip.",
+        "audio": {
+          "intent": "required",
+          "cueId": "grab",
+          "reason": "A low dry contact suggests a light grip before movement."
+        }
+      },
+      {
+        "id": "drag-window",
+        "beatId": "move",
+        "shotId": "workspace",
+        "frame": 220,
+        "type": "drag",
+        "detail": "Window and hand share the same eased translation through frame 286; attachment remains fixed.",
+        "audio": {
+          "intent": "required",
+          "cueId": "drag",
+          "reason": "Quiet filtered surface friction follows the drag envelope, with no sustained tone."
+        }
+      },
+      {
+        "id": "drag-stop",
+        "beatId": "move",
+        "shotId": "workspace",
+        "frame": 286,
+        "type": "reveal",
+        "detail": "Pointer and window stop together before release.",
+        "audio": {
+          "intent": "silent",
+          "cueId": null,
+          "reason": "The friction envelope is already ending; no extra stop sound."
+        }
+      },
+      {
+        "id": "release-title",
+        "beatId": "move",
+        "shotId": "workspace",
+        "frame": 288,
+        "type": "release",
+        "detail": "Pressed state ends after the pointer/window movement has stopped.",
+        "audio": {
+          "intent": "required",
+          "cueId": "grip-release",
+          "reason": "A distinct up-contact ends the grip."
+        }
+      },
+      {
+        "id": "drop-window",
+        "beatId": "move",
+        "shotId": "workspace",
+        "frame": 290,
+        "type": "drop",
+        "detail": "The stationary window remains in front; the drop resolves the released action, with no rubber wobble.",
+        "audio": {
+          "intent": "required",
+          "cueId": "drop",
+          "reason": "A restrained low material contact and small secondary tap complete the gesture."
+        }
+      },
+      {
+        "id": "camera-attention",
+        "beatId": "resolve",
+        "shotId": "workspace",
+        "frame": 304,
+        "type": "transition",
+        "detail": "One restrained camera move directs attention to the completed folder and stops by 348.",
+        "audio": {
+          "intent": "required",
+          "cueId": "camera-paper",
+          "reason": "A quiet paper-brush accent marks the change of attention, not continuous camera noise."
+        }
+      },
+      {
+        "id": "camera-settled",
+        "beatId": "resolve",
+        "shotId": "workspace",
+        "frame": 348,
+        "type": "reveal",
+        "detail": "Camera is stationary, with menu labels inside the frame and closing type about to resolve.",
+        "audio": {
+          "intent": "silent",
+          "cueId": null,
+          "reason": "Silence protects the closing reading hold."
+        }
+      },
+      {
+        "id": "closing-hold",
+        "beatId": "resolve",
+        "shotId": "workspace",
+        "frame": 370,
+        "type": "reveal",
+        "detail": "The closing caption is fully readable and all motion has stopped.",
+        "audio": {
+          "intent": "silent",
+          "cueId": null,
+          "reason": "Let the final thought breathe; no success beep, voice or music."
+        }
+      }
+    ],
+    "assets": [
+      {
+        "src": "assets/audio/open-press.wav",
+        "category": "press",
+        "sha256": "453e88f9a4913e2a175cda519782b4db41a630376040c0d696abbc0ec449d365",
+        "provenance": {
+          "kind": "original-synthesis",
+          "author": "Framecraft acceptance exercise",
+          "license": "CC0-1.0, original generated PCM released for reuse",
+          "recipe": "production/synthesize.ts"
+        }
+      },
+      {
+        "src": "assets/audio/open-release.wav",
+        "category": "release",
+        "sha256": "bbbef556718f3faee124f3794cd81016577ce1726c0ec6f44198f13c37820a51",
+        "provenance": {
+          "kind": "original-synthesis",
+          "author": "Framecraft acceptance exercise",
+          "license": "CC0-1.0, original generated PCM released for reuse",
+          "recipe": "production/synthesize.ts"
+        }
+      },
+      {
+        "src": "assets/audio/typing.wav",
+        "category": "key",
+        "sha256": "7ab710797476d05bbe286646c41d677f710d37bf7a0bfb3d257e56c3c7cc0793",
+        "provenance": {
+          "kind": "original-synthesis",
+          "author": "Framecraft acceptance exercise",
+          "license": "CC0-1.0, original generated PCM released for reuse",
+          "recipe": "production/synthesize.ts"
+        }
+      },
+      {
+        "src": "assets/audio/confirm.wav",
+        "category": "key",
+        "sha256": "9e4f1483782a8316e011370c30e3d13aaaa571b8104cbe51c1a33980368231ad",
+        "provenance": {
+          "kind": "original-synthesis",
+          "author": "Framecraft acceptance exercise",
+          "license": "CC0-1.0, original generated PCM released for reuse",
+          "recipe": "production/synthesize.ts"
+        }
+      },
+      {
+        "src": "assets/audio/grip-press.wav",
+        "category": "press",
+        "sha256": "105ff5f1b7e04a71bc92fda662f8d415a8c89ca894c192811e638322aff7b3fd",
+        "provenance": {
+          "kind": "original-synthesis",
+          "author": "Framecraft acceptance exercise",
+          "license": "CC0-1.0, original generated PCM released for reuse",
+          "recipe": "production/synthesize.ts"
+        }
+      },
+      {
+        "src": "assets/audio/grab.wav",
+        "category": "grab",
+        "sha256": "bcb0801275e4a254f9e1a54c2cf522baa12e9543b09f3fd5baf732e441ba1127",
+        "provenance": {
+          "kind": "original-synthesis",
+          "author": "Framecraft acceptance exercise",
+          "license": "CC0-1.0, original generated PCM released for reuse",
+          "recipe": "production/synthesize.ts"
+        }
+      },
+      {
+        "src": "assets/audio/drag.wav",
+        "category": "drag",
+        "sha256": "cc9b5395954f0905a6ae6ea23d78e5fe348b17ef10ceab46bc2a5bf2a9b41cc8",
+        "provenance": {
+          "kind": "original-synthesis",
+          "author": "Framecraft acceptance exercise",
+          "license": "CC0-1.0, original generated PCM released for reuse",
+          "recipe": "production/synthesize.ts"
+        }
+      },
+      {
+        "src": "assets/audio/grip-release.wav",
+        "category": "release",
+        "sha256": "db29139b4053a0d8a2eb5ffc97e3b7e38e98ed63b82968cf069987cc025835e2",
+        "provenance": {
+          "kind": "original-synthesis",
+          "author": "Framecraft acceptance exercise",
+          "license": "CC0-1.0, original generated PCM released for reuse",
+          "recipe": "production/synthesize.ts"
+        }
+      },
+      {
+        "src": "assets/audio/drop.wav",
+        "category": "drop",
+        "sha256": "e9a68d87b186d53c76325352b028da34400dbf5a6637f507f89972431cc4a062",
+        "provenance": {
+          "kind": "original-synthesis",
+          "author": "Framecraft acceptance exercise",
+          "license": "CC0-1.0, original generated PCM released for reuse",
+          "recipe": "production/synthesize.ts"
+        }
+      },
+      {
+        "src": "assets/audio/camera-paper.wav",
+        "category": "transition",
+        "sha256": "98cc0f427d2325baea5d11bbcaf0e02ff6fd58200ad6beefba43fa87dd344324",
+        "provenance": {
+          "kind": "original-synthesis",
+          "author": "Framecraft acceptance exercise",
+          "license": "CC0-1.0, original generated PCM released for reuse",
+          "recipe": "production/synthesize.ts"
+        }
+      }
+    ],
+    "quiet": [
+      {
+        "startFrame": 0,
+        "endFrame": 48,
+        "reason": "Orient and read before the first contact."
+      },
+      {
+        "startFrame": 64,
+        "endFrame": 90,
+        "reason": "Focus is visible; do not add redundant sonic feedback."
+      },
+      {
+        "startFrame": 169,
+        "endFrame": 202,
+        "reason": "Read the confirmed name while the pointer prepares its next action."
+      },
+      {
+        "startFrame": 322,
+        "endFrame": 450,
+        "reason": "The camera settles and the closing thought holds without chatter."
+      }
+    ]
+  }
+}

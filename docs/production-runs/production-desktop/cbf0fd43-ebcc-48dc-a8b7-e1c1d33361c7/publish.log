@@ -1,0 +1,4 @@
+$ bun scripts/production.ts publish --project projects/production-desktop --scene desk --run "cbf0fd43-ebcc-48dc-a8b7-e1c1d33361c7"
+/home/radityra/projects/framecraft/output/production-desktop/final/desk-cbf0fd43-ebcc-48dc-a8b7-e1c1d33361c7.mp4
+1230072 bytes; technically-verified; listening partial-listening-pending.
+Cleanup: 41 files, 6763426 bytes. Report: /home/radityra/projects/framecraft/docs/production-runs/production-desktop/cbf0fd43-ebcc-48dc-a8b7-e1c1d33361c7/report.md

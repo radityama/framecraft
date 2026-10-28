@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "tests": {
+    "passed": 125,
+    "failed": 0,
+    "assertions": 1106,
+    "total": 125,
+    "files": 31,
+    "seconds": 352.7,
+    "log": "regression-file-guard.log"
+  },
+  "final": {
+    "sha256": "985829bf6f16ffafc6467a856209753facc61c4891f33294399864e8c9867058",
+    "bytes": 1230072
+  },
+  "cleanup": {
+    "filesRemoved": 41,
+    "bytesReclaimed": 6763426,
+    "preserved": [],
+    "failures": []
+  },
+  "additionalLogsArchived": [
+    "regression-file-guard.log",
+    "contracts-directory-red.log",
+    "contracts-final.log",
+    "cleanup-file-guard.log",
+    "studio-repeat.log"
+  ],
+  "subjectiveListening": "pending",
+  "humanApproval": "not-required"
+}

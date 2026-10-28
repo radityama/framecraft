@@ -1,0 +1,15 @@
+# Additive production workflow
+
+Approved in this session, including the five follow-up requirements. No commits or pushes are authorized.
+
+Keep the HTML runtime, Remotion compositions, scene audio engine, Studio, review verifier and legacy CLIs unchanged. Add strict version-one production brief and beat/event/asset contracts beside a selected project's manifests. Runtime validation cross-checks concrete scene frames and existing resolved audio cues, not a second timing engine. Six optional creative templates inform judgment, not hard-coded aesthetics.
+
+`production check` validates intent and executable mappings. `production prepare` creates a unique private scratch directory, captures planned states through the existing shot composition and Remotion renderStill integration, renders through the existing render command, and measures the complete MP4. Logs, contracts, hashes and reports are permanent, outside the project digest. An agent opens every capture and records a named, source/candidate-bound creative review. `production publish` rechecks source, captures, review and media, archives frame hashes/descriptions with final-video references, atomically publishes a uniquely named export, then deletes only individually registered and unchanged scratch media. `production cleanup` retries that same cleanup idempotently. No arbitrary output/cleanup roots are exposed by the CLI.
+
+Gate A is machine-verifiable. Gate B records motion observations and sound measurements separately from subjective listening. Gate C requires human editorial approval only when the brief requires it. Publication of a technically verified film with explicitly pending listening is permitted, but cannot be called fully agent-reviewed or human-approved. Open blocking/major findings or required missing human approval prevent publication. Any prepublication failure retains diagnostics and scratch files.
+
+Cleanup uses an explicit ownership ledger in permanent documentation. It rejects traversal, links, special files, changed files, and undocumented media; it never recursively removes a tree or infers ownership from an extension. Unknown files remain and are reported. Source, documentation, annotations and older runs are not cleanup targets. Archive descriptions replace disposable media links before cleanup. Final delivery directories contain exports only.
+
+Acceptance: an isolated 450-frame, 1920×1080, 30fps desktop simulation. A folder is created and named, a window is grabbed/moved/released, and a restrained camera move yields a reading hold. Original seeded mechanical/contact sounds include press/release, grab, friction, drop, typing and a paper-like transition. No music, voice, remote assets or electronic beeps. Warm neutral desktop, Plex typography and restrained orange focus communicate a quiet working desk, not floating dashboard cards.
+
+Self-review: no renderer changes, no Studio redesign, no new dependencies, no automatic reviewers, no legacy contract requirement. Subjective listening remains pending when unavailable. The user authorized implementation without further routine approval stops.

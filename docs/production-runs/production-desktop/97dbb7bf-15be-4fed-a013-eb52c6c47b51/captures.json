@@ -1,0 +1,326 @@
+{
+  "schemaVersion": 1,
+  "storage": "temporary-prepublication",
+  "frames": [
+    {
+      "shotId": "workspace",
+      "localFrame": 0,
+      "globalFrame": 0,
+      "path": "screenshots/workspace-local-0000-global-0000.png",
+      "sha256": "81e7f5df975f48a5c229b4e038151a09acb21ee0e8181d750363598018aee651",
+      "bytes": 135015
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 26,
+      "globalFrame": 26,
+      "path": "screenshots/workspace-local-0026-global-0026.png",
+      "sha256": "be31adfd754db0ea469a3783151088471957774c87888ccecfbdd9886651c946",
+      "bytes": 135034
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 53,
+      "globalFrame": 53,
+      "path": "screenshots/workspace-local-0053-global-0053.png",
+      "sha256": "b1b0b392357440134db55e8b485d33b1963996d2907408382912e904071e636c",
+      "bytes": 134998
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 54,
+      "globalFrame": 54,
+      "path": "screenshots/workspace-local-0054-global-0054.png",
+      "sha256": "883386628b25e75038c35825c7f423a201f962563f59ce6c66213fb22ac24a26",
+      "bytes": 134893
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 55,
+      "globalFrame": 55,
+      "path": "screenshots/workspace-local-0055-global-0055.png",
+      "sha256": "883386628b25e75038c35825c7f423a201f962563f59ce6c66213fb22ac24a26",
+      "bytes": 134893
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 56,
+      "globalFrame": 56,
+      "path": "screenshots/workspace-local-0056-global-0056.png",
+      "sha256": "883386628b25e75038c35825c7f423a201f962563f59ce6c66213fb22ac24a26",
+      "bytes": 134893
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 57,
+      "globalFrame": 57,
+      "path": "screenshots/workspace-local-0057-global-0057.png",
+      "sha256": "9cfd64153b74a3eed0ed30c28e0b560de26c5901877330114f033c52e7f9a12e",
+      "bytes": 143267
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 58,
+      "globalFrame": 58,
+      "path": "screenshots/workspace-local-0058-global-0058.png",
+      "sha256": "9cfd64153b74a3eed0ed30c28e0b560de26c5901877330114f033c52e7f9a12e",
+      "bytes": 143267
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 74,
+      "globalFrame": 74,
+      "path": "screenshots/workspace-local-0074-global-0074.png",
+      "sha256": "9cfd64153b74a3eed0ed30c28e0b560de26c5901877330114f033c52e7f9a12e",
+      "bytes": 143267
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 95,
+      "globalFrame": 95,
+      "path": "screenshots/workspace-local-0095-global-0095.png",
+      "sha256": "9cfd64153b74a3eed0ed30c28e0b560de26c5901877330114f033c52e7f9a12e",
+      "bytes": 143267
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 96,
+      "globalFrame": 96,
+      "path": "screenshots/workspace-local-0096-global-0096.png",
+      "sha256": "66a285df56f6c647c58c3b1219e4d462c33079f090042346e7f421768a28c039",
+      "bytes": 140215
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 112,
+      "globalFrame": 112,
+      "path": "screenshots/workspace-local-0112-global-0112.png",
+      "sha256": "81836c12a65536cf414ae122919194890d32c186d54e68a0b6b5bc01e00967d5",
+      "bytes": 140872
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 134,
+      "globalFrame": 134,
+      "path": "screenshots/workspace-local-0134-global-0134.png",
+      "sha256": "b97c23d91284908856dbdfd3b3e58c2597ea1d72f64265b5b16e6a7c6dd4e49a",
+      "bytes": 141986
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 145,
+      "globalFrame": 145,
+      "path": "screenshots/workspace-local-0145-global-0145.png",
+      "sha256": "de09005484b32d74282bab3d3349ebc5a1c0dab3a388486016d0ce55bc86a941",
+      "bytes": 142793
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 159,
+      "globalFrame": 159,
+      "path": "screenshots/workspace-local-0159-global-0159.png",
+      "sha256": "ef0dce52cfd44f1e2a3391fd8db6d697582bcf3fa1ad6ec5376dd8c61e6c0349",
+      "bytes": 143046
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 173,
+      "globalFrame": 173,
+      "path": "screenshots/workspace-local-0173-global-0173.png",
+      "sha256": "ef0dce52cfd44f1e2a3391fd8db6d697582bcf3fa1ad6ec5376dd8c61e6c0349",
+      "bytes": 143046
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 174,
+      "globalFrame": 174,
+      "path": "screenshots/workspace-local-0174-global-0174.png",
+      "sha256": "ef0dce52cfd44f1e2a3391fd8db6d697582bcf3fa1ad6ec5376dd8c61e6c0349",
+      "bytes": 143046
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 196,
+      "globalFrame": 196,
+      "path": "screenshots/workspace-local-0196-global-0196.png",
+      "sha256": "ff58e9e1cfcfb91d2e00052d6d04d13a698a9cae3dbd80f71027635479b5f00c",
+      "bytes": 143113
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 211,
+      "globalFrame": 211,
+      "path": "screenshots/workspace-local-0211-global-0211.png",
+      "sha256": "8425572920e03e72829eeb5fa8e5e27455f190ec2014b02cd2be9f22db7f69b7",
+      "bytes": 143691
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 212,
+      "globalFrame": 212,
+      "path": "screenshots/workspace-local-0212-global-0212.png",
+      "sha256": "8c9593481c392f12948b62787b5fa11ddb622465ff525339166700b5624a19d0",
+      "bytes": 143079
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 213,
+      "globalFrame": 213,
+      "path": "screenshots/workspace-local-0213-global-0213.png",
+      "sha256": "8c9593481c392f12948b62787b5fa11ddb622465ff525339166700b5624a19d0",
+      "bytes": 143079
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 214,
+      "globalFrame": 214,
+      "path": "screenshots/workspace-local-0214-global-0214.png",
+      "sha256": "8c9593481c392f12948b62787b5fa11ddb622465ff525339166700b5624a19d0",
+      "bytes": 143079
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 215,
+      "globalFrame": 215,
+      "path": "screenshots/workspace-local-0215-global-0215.png",
+      "sha256": "8c9593481c392f12948b62787b5fa11ddb622465ff525339166700b5624a19d0",
+      "bytes": 143079
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 219,
+      "globalFrame": 219,
+      "path": "screenshots/workspace-local-0219-global-0219.png",
+      "sha256": "8c9593481c392f12948b62787b5fa11ddb622465ff525339166700b5624a19d0",
+      "bytes": 143079
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 220,
+      "globalFrame": 220,
+      "path": "screenshots/workspace-local-0220-global-0220.png",
+      "sha256": "8c9593481c392f12948b62787b5fa11ddb622465ff525339166700b5624a19d0",
+      "bytes": 143079
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 224,
+      "globalFrame": 224,
+      "path": "screenshots/workspace-local-0224-global-0224.png",
+      "sha256": "93de72f8eefeb4a330567caa82e49891bcd87a4c581a6aab2cda51e3772cc6d1",
+      "bytes": 144558
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 261,
+      "globalFrame": 261,
+      "path": "screenshots/workspace-local-0261-global-0261.png",
+      "sha256": "0a9ac58c3e66c8b991d32adb8604d5a08d01869b2424e5f1c1aa968a999c51c9",
+      "bytes": 132680
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 286,
+      "globalFrame": 286,
+      "path": "screenshots/workspace-local-0286-global-0286.png",
+      "sha256": "245b49b926ea901206fcd2220de484da8df5d8c8684f620470379f1dde452dc6",
+      "bytes": 131951
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 287,
+      "globalFrame": 287,
+      "path": "screenshots/workspace-local-0287-global-0287.png",
+      "sha256": "245b49b926ea901206fcd2220de484da8df5d8c8684f620470379f1dde452dc6",
+      "bytes": 131951
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 288,
+      "globalFrame": 288,
+      "path": "screenshots/workspace-local-0288-global-0288.png",
+      "sha256": "43ea3642d461fc3422d2256812575bf2b41f985cbf0803160ac915352b0ba01e",
+      "bytes": 132515
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 289,
+      "globalFrame": 289,
+      "path": "screenshots/workspace-local-0289-global-0289.png",
+      "sha256": "43ea3642d461fc3422d2256812575bf2b41f985cbf0803160ac915352b0ba01e",
+      "bytes": 132515
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 290,
+      "globalFrame": 290,
+      "path": "screenshots/workspace-local-0290-global-0290.png",
+      "sha256": "43ea3642d461fc3422d2256812575bf2b41f985cbf0803160ac915352b0ba01e",
+      "bytes": 132515
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 291,
+      "globalFrame": 291,
+      "path": "screenshots/workspace-local-0291-global-0291.png",
+      "sha256": "43ea3642d461fc3422d2256812575bf2b41f985cbf0803160ac915352b0ba01e",
+      "bytes": 132515
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 303,
+      "globalFrame": 303,
+      "path": "screenshots/workspace-local-0303-global-0303.png",
+      "sha256": "3e4533366c15c2be13615f64c75b88be9ae4ba33b231ea2060083e05aee56044",
+      "bytes": 131953
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 304,
+      "globalFrame": 304,
+      "path": "screenshots/workspace-local-0304-global-0304.png",
+      "sha256": "aca88091372d673a84b3f4d6ea51f0e1058a592b49efb7a817e0ff3efaaf7448",
+      "bytes": 131943
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 336,
+      "globalFrame": 336,
+      "path": "screenshots/workspace-local-0336-global-0336.png",
+      "sha256": "d57d1359e7c84dc07edeb5a3f42f3bdcf14dc207ea7a56f20ece7d33ed47930f",
+      "bytes": 135530
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 348,
+      "globalFrame": 348,
+      "path": "screenshots/workspace-local-0348-global-0348.png",
+      "sha256": "4a1dfa3edfd9374cea6853536f27e4cbac436908b8730274a3b9d2b2b8b0d795",
+      "bytes": 136164
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 370,
+      "globalFrame": 370,
+      "path": "screenshots/workspace-local-0370-global-0370.png",
+      "sha256": "a392a343e62f1b11e4443e3aacc2622fd47f188400c920138cc11fe0354521b5",
+      "bytes": 134925
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 376,
+      "globalFrame": 376,
+      "path": "screenshots/workspace-local-0376-global-0376.png",
+      "sha256": "a392a343e62f1b11e4443e3aacc2622fd47f188400c920138cc11fe0354521b5",
+      "bytes": 134925
+    },
+    {
+      "shotId": "workspace",
+      "localFrame": 449,
+      "globalFrame": 449,
+      "path": "screenshots/workspace-local-0449-global-0449.png",
+      "sha256": "a392a343e62f1b11e4443e3aacc2622fd47f188400c920138cc11fe0354521b5",
+      "bytes": 134925
+    }
+  ]
+}

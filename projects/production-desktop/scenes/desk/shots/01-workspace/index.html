@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="../../../../assets/fonts/fonts.css">
+  <style>
+    *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:"IBM Plex Sans",sans-serif;color:#252d2c;background:#ebe8df}
+    #desktop{position:absolute;inset:0;transform-origin:1050px 470px}
+    .menu{height:56px;background:#e2dfd6;border-bottom:1px solid #ccc9c0;display:flex;align-items:center;padding:0 42px;gap:34px;font-size:22px}
+    .menu strong{font-weight:600;margin-right:16px}.menu .right{margin-left:auto;color:#535b57;font-size:20px}
+    .desktop-label{position:absolute;left:48px;top:99px;font-size:19px;color:#59625e}
+    .window{position:absolute;border:1px solid #a7aaa2;border-radius:10px;overflow:hidden;background:#f8f7f1}
+    .titlebar{height:60px;display:flex;align-items:center;gap:10px;padding:0 24px;background:#e5e6df;border-bottom:1px solid #c9cdc4;font-size:24px}
+    .controls{display:flex;gap:12px;margin-right:28px}.controls i{display:block;width:14px;height:14px;border:1px solid #707a72;border-radius:50%;background:#d0d4cb}
+    .titlebar .trailing{margin-left:auto;font-size:22px;color:#505b54}
+    .reference{left:1150px;top:255px;width:524px;height:474px;box-shadow:0 10px 25px #252d2c18;z-index:1}
+    .reference .titlebar{background:#d9ded5;color:#4b574e;font-size:22px}.reference article{padding:34px 40px}
+    .reference h2{font-family:"IBM Plex Serif",serif;font-weight:400;font-size:34px;margin:0 0 24px}.reference p{font-size:23px;line-height:1.6;margin:0;color:#46544a}
+    .reference .rule{height:1px;background:#c6cbbf;margin:28px 0}.reference small{font-size:19px;color:#566157}
+    #files{left:250px;top:160px;width:1100px;height:660px;box-shadow:0 18px 40px #252d2c26;z-index:2}
+    .toolbar{height:86px;display:flex;align-items:center;border-bottom:1px solid #d4d7ce;padding:0 30px;gap:26px;background:#f3f3ec}
+    .back{font-size:31px;color:#59635b}.breadcrumb{margin-left:38px;font-size:24px}.breadcrumb span{color:#647065;margin-right:18px}
+    #new-button{margin-left:auto;border:1px solid #929e90;border-radius:5px;padding:12px 20px;background:#fafaf5;font-size:22px;line-height:28px;box-shadow:0 1px 1px #252d2c12}
+    #new-button.pressed{background:#d4dacd;box-shadow:inset 0 1px 2px #252d2c26}
+    .sidebar{position:absolute;left:0;top:146px;bottom:0;width:225px;background:#e9ece3;border-right:1px solid #d1d6ca;padding:28px 18px;font-size:23px}
+    .sidebar .group{font-size:18px;color:#5d695d;margin:0 14px 18px}.sidebar p{padding:12px 14px;margin:0 0 8px}.sidebar .active{background:#d9dfd1;border-radius:5px;font-weight:500}
+    .table{margin-left:225px}.columns{height:58px;display:grid;grid-template-columns:1fr 150px 154px;align-items:center;padding:0 30px;border-bottom:1px solid #d8dcd2;font-size:19px;color:#5b675c}
+    .row{height:78px;display:grid;grid-template-columns:1fr 150px 154px;align-items:center;padding:0 30px;font-size:24px;border-bottom:1px solid #e2e5dc}
+    .row .name{display:flex;align-items:center;gap:18px}.row .kind,.row .modified{font-size:20px;color:#576257}
+    .folder{width:34px;height:26px;border:1.5px solid #626e52;border-radius:3px;position:relative;background:#c5cfae;flex-shrink:0}.folder:before{content:"";position:absolute;top:-6px;left:-1.5px;width:17px;height:7px;background:#c5cfae;border:1.5px solid #626e52;border-bottom:0;border-radius:3px 3px 0 0}
+    .document{width:25px;height:31px;border:1.5px solid #7d877a;background:#fdfdf6;margin:0 5px 0 4px;position:relative}.document:after{content:"";position:absolute;left:5px;right:5px;top:9px;height:1px;background:#929b8d;box-shadow:0 5px #929b8d,0 10px #929b8d}
+    #created{background:#e9eddf}#rename{padding:4px 8px;margin-left:-8px;width:300px;white-space:nowrap;border:1.5px solid transparent;border-radius:3px;font-size:25px;line-height:34px;position:relative}
+    #rename.focused{background:#fffdf7;border-color:#a14323}#rename.selected span{background:#e5ceb9}#caret{display:inline-block;width:1.5px;height:27px;vertical-align:-5px;background:#873b22;margin-left:1px}
+    .statusbar{position:absolute;bottom:0;left:225px;right:0;height:48px;background:#f1f2e9;border-top:1px solid #d4d9cb;display:flex;align-items:center;padding:0 30px;font-size:18px;color:#596754}
+    .dock{position:absolute;bottom:31px;right:56px;display:flex;align-items:center;gap:18px;font-size:20px;color:#4f5c50}.dock-icon{width:43px;height:37px;background:#b8c3a3;border:1.5px solid #687657;border-radius:5px;position:relative}.dock-icon:after{content:"";position:absolute;width:5px;height:5px;background:#58684c;border-radius:50%;left:18px;bottom:-12px}
+    #pointer{position:absolute;left:0;top:0;width:34px;height:43px;z-index:10;transform-origin:0 0;filter:drop-shadow(1px 2px 1px #252d2c33)}#pointer svg{position:absolute;overflow:visible}#hand{left:-18px;top:-20px}
+    #caption{position:absolute;left:82px;bottom:71px;font-family:"IBM Plex Serif",serif;font-size:42px;font-weight:400;letter-spacing:-0.7px;margin:0;z-index:20}
+    .caption-note{position:absolute;left:84px;bottom:37px;font-size:18px;color:#586157}
+  </style>
+</head>
+<body>
+  <div id="desktop">
+    <div class="menu"><strong>Field desk</strong><span>File</span><span>Edit</span><span>View</span><span class="right">Desktop simulation&nbsp;&nbsp;&nbsp;&nbsp; 09:41</span></div>
+    <div class="desktop-label">A working space</div>
+    <section class="window reference" aria-label="Inactive reference window"><div class="titlebar"><div class="controls"><i></i><i></i><i></i></div>Reference</div><article><h2>Keep a little space.</h2><p>Gather the useful things.<br>Give the next idea a home.</p><div class="rule"></div><small>Notes for a quieter working day.</small></article></section>
+    <section class="window" id="files" aria-label="Active workspace window">
+      <div class="titlebar" id="grip"><div class="controls"><i></i><i></i><i></i></div><span>Workspace</span><svg class="trailing" width="24" height="24" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="m15 15 6 6" stroke="currentColor" stroke-width="1.5"/></svg></div>
+      <div class="toolbar"><span class="back">‹ &nbsp; ›</span><div class="breadcrumb"><span>Workspace /</span> Notes</div><div id="new-button">+ &nbsp; New folder</div></div>
+      <aside class="sidebar"><div class="group">Places</div><p>Home</p><p class="active">Workspace</p><p>Documents</p><p>Archive</p></aside>
+      <div class="table"><div class="columns"><span>Name</span><span>Kind</span><span>Modified</span></div>
+        <div class="row"><div class="name"><i class="folder"></i>Reference</div><span class="kind">Folder</span><span class="modified">Today</span></div>
+        <div class="row"><div class="name"><i class="folder"></i>Drafts</div><span class="kind">Folder</span><span class="modified">Today</span></div>
+        <div class="row"><div class="name"><i class="document"></i>Readme.txt</div><span class="kind">Text</span><span class="modified">Today</span></div>
+        <div class="row" id="created"><div class="name"><i class="folder"></i><div id="rename"><span id="name"></span><b id="caret"></b></div></div><span class="kind">Folder</span><span class="modified">Just now</span></div>
+      </div>
+      <div class="statusbar" id="status"></div>
+    </section>
+    <div class="dock"><i class="dock-icon"></i><span>Workspace</span></div>
+    <div id="pointer"><svg id="arrow" width="30" height="39" viewBox="0 0 30 39"><path d="M1 1 L1 29 L8 23 L14 36 L20 33 L14 21 L25 20 Z" fill="#fcfcf5" stroke="#29322a" stroke-width="2" stroke-linejoin="round"/></svg><svg id="hand" width="36" height="40" viewBox="0 0 36 40" fill="#fcfcf5" stroke="#29322a" stroke-width="1.8" stroke-linejoin="round"><path id="open-hand" d="M10 22 L7 10 Q6 6 9 6 Q11 6 12 10 L15 20 L14 5 Q14 2 17 2 Q20 2 20 5 L20 19 L22 6 Q23 3 26 5 Q27 6 26 9 L25 20 L29 12 Q31 9 33 11 Q35 12 33 16 L29 28 Q27 34 24 37 H15 Q11 34 8 30 L3 24 Q1 21 3 19 Q6 17 10 22 Z"/><path id="closed-hand" d="M10 19 L10 14 Q10 10 14 11 L16 15 V11 Q16 7 20 9 L22 14 Q23 9 27 12 L29 17 Q33 14 34 19 L32 28 Q30 34 26 37 H15 Q11 34 8 30 L4 25 Q1 21 4 19 Q6 17 10 22 Z"/></svg></div>
+  </div>
+  <h1 id="caption">Start with a little order.</h1><span class="caption-note">A desktop interaction study</span>
+  <script src="../../../../runtime.js"></script>
+  <script>
+    const $ = s => document.querySelector(s);
+    const clamp = p => Math.max(0, Math.min(1, p));
+    const ease = p => { p = clamp(p); return p * p * (3 - 2 * p); };
+    const progress = (f, a, b) => ease((f - a) / (b - a));
+    const path = (p, a, b, c, d) => ({x:(1-p)**3*a.x+3*(1-p)**2*p*b.x+3*(1-p)*p*p*c.x+p**3*d.x,y:(1-p)**3*a.y+3*(1-p)**2*p*b.y+3*(1-p)*p*p*c.y+p**3*d.y});
+    const keys = [96,100,105,110,116,120,125,130,134,140,145];
+    window.framecraft.shot({renderFrame({frame:f}) {
+      const drag = progress(f,220,286), dx = drag*230, dy = drag*-32;
+      $('#files').style.transform = `translate(${dx}px,${dy}px)`;
+      $('#desktop').style.transform = `scale(${1 + progress(f,304,348)*0.025})`;
+      $('#new-button').className = f>=54&&f<57?'pressed':'';
+      $('#created').style.display = f>=57?'grid':'none';
+      const length = keys.filter(k=>f>=k).length;
+      $('#name').textContent = f<96?'Untitled folder':'Field notes'.slice(0,length);
+      $('#rename').className = f>=57&&f<159?`focused ${f<96?'selected':''}`:'';
+      $('#caret').style.display = f>=96&&f<159&&Math.floor(f/13)%2===0?'inline-block':'none';
+      $('#status').textContent = f<57?'3 items':f<159?'Naming a new folder':'4 items · Field notes selected';
+      let cursor={x:1530,y:874};
+      if(f>=18&&f<54)cursor=path(progress(f,18,48),{x:1530,y:874},{x:1540,y:635},{x:1240,y:244},{x:1238,y:263});
+      else if(f>=54&&f<174)cursor={x:1238,y:263};
+      else if(f>=174&&f<212)cursor=path(progress(f,174,204),{x:1238,y:263},{x:1148,y:219},{x:859,y:160},{x:800,y:190});
+      else if(f>=212&&f<300)cursor={x:800+dx,y:190+dy};
+      else if(f>=300)cursor=path(progress(f,300,332),{x:1030,y:158},{x:1210,y:180},{x:1540,y:628},{x:1555,y:852});
+      const pressed=f>=54&&f<57||f>=212&&f<288;
+      $('#pointer').style.transform=`translate(${cursor.x}px,${cursor.y}px) scale(${pressed?0.94:1})`;
+      $('#arrow').style.display=f>=204&&f<300?'none':'block';
+      $('#hand').style.display=f>=204&&f<300?'block':'none';
+      $('#open-hand').style.display=pressed?'none':'block';
+      $('#closed-hand').style.display=pressed?'block':'none';
+      $('#pointer').dataset.x=String(cursor.x);$('#pointer').dataset.y=String(cursor.y);$('#pointer').dataset.pressed=String(pressed);
+      $('#files').dataset.dx=String(dx);$('#files').dataset.dy=String(dy);$('#files').dataset.dragging=String(f>=220&&f<288);
+      const ending=progress(f,354,370);
+      $('#caption').textContent=f<354?'Start with a little order.':'A little room to think.';
+      $('#caption').style.opacity=String(f<354?1-progress(f,342,354):ending);
+      $('#caption').style.transform=`translateY(${f<354?0:(1-ending)*5}px)`;
+    }});
+  </script>
+</body>
+</html>

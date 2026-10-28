@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "id": "motion-benchmark-02",
+  "title": "FRAMECRAFT / MOTION STUDIES VOL. 02",
+  "video": {"width": 1920, "height": 1080, "fps": 30, "background": "#101114"},
+  "scenes": [{"id": "film", "path": "scenes/film/scene.json"}],
+  "audio": []
+}

@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "sha256": "801b6f12b23c852914db3ebba13514121ed84a5ba1d5c498e7a14d45efbe6464",
+  "bytes": 1229410,
+  "decoded": true,
+  "video": {
+    "codec": "h264",
+    "pixelFormat": "yuv420p",
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "frames": 450,
+    "durationSeconds": 15
+  },
+  "audio": {
+    "present": true,
+    "codec": "aac",
+    "channels": 2,
+    "sampleRate": 48000,
+    "peak": 0.0784912109375,
+    "rms": 0.0034335117042996093,
+    "cues": [
+      {
+        "id": "open-press",
+        "expectedFrame": 54,
+        "correlation": 0.9577549761722157,
+        "offsetFrames": 0
+      },
+      {
+        "id": "open-release",
+        "expectedFrame": 57,
+        "correlation": 0.9711348285718383,
+        "offsetFrames": 0
+      },
+      {
+        "id": "typing",
+        "expectedFrame": 96,
+        "correlation": 0.9594030257449554,
+        "offsetFrames": 0
+      },
+      {
+        "id": "confirm",
+        "expectedFrame": 159,
+        "correlation": 0.9570993862742956,
+        "offsetFrames": 0
+      },
+      {
+        "id": "grip-press",
+        "expectedFrame": 212,
+        "correlation": 0.9530329986233209,
+        "offsetFrames": 0.01
+      },
+      {
+        "id": "grab",
+        "expectedFrame": 214,
+        "correlation": 0.9630847660156985,
+        "offsetFrames": -0.01
+      },
+      {
+        "id": "drag",
+        "expectedFrame": 220,
+        "correlation": 0.9843423016018954,
+        "offsetFrames": 0.01
+      },
+      {
+        "id": "grip-release",
+        "expectedFrame": 288,
+        "correlation": 0.972861504111925,
+        "offsetFrames": 0
+      },
+      {
+        "id": "drop",
+        "expectedFrame": 290,
+        "correlation": 0.954534035910443,
+        "offsetFrames": 0.01
+      },
+      {
+        "id": "camera-paper",
+        "expectedFrame": 304,
+        "correlation": 0.985930372802419,
+        "offsetFrames": 0.01
+      }
+    ],
+    "quiet": [
+      {
+        "startFrame": 0,
+        "endFrame": 48,
+        "rms": 0
+      },
+      {
+        "startFrame": 64,
+        "endFrame": 90,
+        "rms": 0
+      },
+      {
+        "startFrame": 169,
+        "endFrame": 202,
+        "rms": 0
+      },
+      {
+        "startFrame": 322,
+        "endFrame": 450,
+        "rms": 0
+      }
+    ]
+  }
+}

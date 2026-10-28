@@ -1,5 +1,9 @@
 # HTML shot authoring
 
+## Production work
+
+Before creating or modifying a video project, read [docs/production-standard.md](docs/production-standard.md). It defines brief, beat/event/cue planning, motion and sound review, independent acceptance gates, and safe final-publication cleanup. Use `bun run production` for production acceptance; legacy render, review, Studio and validation commands remain contract-free diagnostic tools. Never call a technical pass human approval or delete historical/user-owned evidence.
+
 ## Public authoring API
 
 Each `projects/<project-id>/project.json` defines the video and references one or more scene manifests. Each shot is an independently loaded HTML file; scene entries specify an ID, an entry relative to the scene, a positive `durationFrames`, and `overlapFrames: 0`. From `projects/demo/scenes/intro/shots/<name>/index.html`, this is a complete minimal shot:

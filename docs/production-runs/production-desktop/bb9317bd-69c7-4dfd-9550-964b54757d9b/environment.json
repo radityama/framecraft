@@ -1,0 +1,14 @@
+{
+  "bun": "1.4.4",
+  "remotion": "4.0.537",
+  "os": {
+    "platform": "linux",
+    "arch": "x64",
+    "release": "7.2.11-200.fc44.x86_64"
+  },
+  "video": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30
+  }
+}

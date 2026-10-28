@@ -1,0 +1,22 @@
+bun test v1.4.4 (38afee6c8)
+
+tests/production-contracts.test.ts:
+75 |     await writeFile(join(temp, 'outside.wav'), 'protected'); await symlink(join(temp, 'outside.wav'), join(temp, 'escape'));
+76 |     for (const path of ['../outside.wav', '/etc/passwd', 'https://example.com/a.wav', 'a\\b', 'a/../b']) await expect(localFile(root, path)).rejects.toThrow();
+77 |     await expect(localFile(temp, 'escape')).resolves.toBe(join(temp, 'outside.wav'));
+78 |     await symlink('/etc/passwd', join(temp, 'outside'));
+79 |     await expect(localFile(temp, 'outside')).rejects.toThrow('escapes');
+80 |     await expect(localFile(root, 'assets/audio')).rejects.toThrow('regular file');
+                                                               ^
+error: expect(received).rejects.toThrow(expected)
+
+Expected promise that rejects
+Received promise that resolved: Promise { <resolved> }
+
+      at <anonymous> (/home/radityra/projects/framecraft/tests/production-contracts.test.ts:80:59)
+(fail) project-local production assets cannot escape by traversal, URL or symlink [2.69ms]
+
+ 6 pass
+ 1 fail
+ 66 expect() calls
+Ran 7 tests across 1 file. [577.00ms]

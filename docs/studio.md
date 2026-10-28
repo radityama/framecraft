@@ -1,6 +1,6 @@
 # Preview Studio
 
-A local browser workspace for inspecting Framecraft shots frame by frame. It plays the same HTML shots the renderer uses; it does not encode video or edit projects.
+A local browser workspace for inspecting Framecraft shots frame by frame and recording visual feedback. It plays the same HTML shots the renderer uses; it does not encode video or edit project source.
 
 ```sh
 bun run studio
@@ -17,10 +17,14 @@ With no arguments, the initial selection is `demo`/`intro`. `--project <path>` a
 - **Shots** lists the selected scene's shots in order with frame counts. Clicking one seeks to its first frame and updates `shot` in the URL. Direct links restore that shot's start, not an arbitrary scrubbed frame. On tablets the list scrolls horizontally above the preview; on phones it uses two columns.
 - **Prev / Next** step exactly one frame and pause.
 - **Play / Pause** runs the Player's own clock. Playback stops on the last frame and does not loop; pressing Play there restarts from frame 0.
-- **Timeline** is a frame range from 0 to the last frame. The filled span marks the current shot; the line marks the playhead.
+- **Start / End / Stop** seek scene boundaries; Stop pauses and returns to zero. Previous shot / Next shot seek adjacent shot starts, bounded at scene ends.
+- **Playback speed** selects 0.25×, 0.5×, 1× or 2× for preview only; export timing never changes.
+- **Timeline** has a scene ruler, proportional shot segments with half-open ranges, current-shot selection, frame-exact range scrubber and numeric frame entry. Fit scene / Zoom in / Zoom out change visualization only; the timeline scrolls independently of the page.
+- **Inspector** shows canonical project/scene/shot, frame, duration, source entry and declared audio assets without implying manifest editing.
+- **Review annotations / Revision comparison** provide persistent feedback and matched captures; see [Visual feedback](feedback.md).
 - The timecode reads `mm:ss:ff` where the last pair is frames at the scene's fps. The frame counter shows `Frame N of last`.
 
-Keyboard: Tab moves through the project and scene pickers, shot buttons, transport and timeline. When focus is not on a control, Space plays or pauses and Left / Right steps one frame (pausing playback). Space or Enter activates a focused button; the focused timeline range responds to its own arrow keys. Shortcuts do not override focused form controls.
+Keyboard: Tab moves through native controls. Outside controls, Space toggles play, Left/Right steps a frame, Shift+Left/Right selects adjacent shots, Home/End selects scene boundaries, +/− zooms, and 0 fits. Space/Enter activates focused buttons; ranges retain native arrow behavior. Shortcuts never override typing in inputs, textareas or editable regions. A shortcut disclosure is beside the timeline.
 
 ## Frame accuracy
 
@@ -34,7 +38,7 @@ Audio follows the Player clock across play, pause, frame seeks and scene switche
 
 The Studio is an app screen, not a marketing page: the preview is the focal point and the chrome stays quiet. It uses the already bundled IBM Plex Sans for interface text and JetBrains Mono only for the timecode and frame readouts, so the workspace and its output share one type system without remote assets. The fixed dark theme is deliberate for judging video colour.
 
-The `data-terminal` direction's accent is a single 1px selection line: active shot, active timeline span, and the Play control. Numbers and labels stay white or grey; no status is carried by colour alone. Design-taste's inspector passes at 1440, 768 and 390 with `font-not-dealt` allowed, because the project's local licensed fonts replace the dealt Public Sans by design. Its one lint warning is intentional: monospace is confined to clock and frame readouts.
+The existing direction uses a quiet selection line and active-shot surface. Numbers and labels stay white or grey; status also uses text. Local licensed fonts are deliberate, and monospace is confined to clocks, source/code and frame readouts. Phase 4 extends this language rather than replacing it; current measurements and screenshots belong in [the Phase 4 report](phase4-report.md), not a historical inspector claim.
 
 ## Server contract and asset boundary
 
@@ -52,12 +56,13 @@ The `data-terminal` direction's accent is a single 1px selection line: active sh
 - `GET /api/project?id=<project-id>` returns validated project data. Shot and audio paths are prefixed with the project ID for `/public/<project-id>/...`.
 - Compatibility: `GET /api/project` still returns the raw demo project and `/public/assets/...`, `/public/scenes/...`, `/public/runtime.js` still serve demo assets. New clients should use the ID-based API and namespace.
 - IDs never authorize paths. Only discovered roots and the explicit CLI root can be served. Static requests reject malformed encoding, traversal, backslashes, NULs, directories and symlink escapes; missing files return 404. Duplicate/malformed API IDs return 400 and unknown IDs return 404.
+- `GET /api/review?project=<id>&scene=<id>` returns validated feedback, expected-revision token, current source SHA and authorized revision summaries. Same-origin JSON `PUT` with `If-Match` saves feedback only. `GET /api/feedback-export` downloads JSON/Markdown; `GET /api/revision-image?revision=<sha>&capture=<index>` reads one authorized, hash-checked PNG. See [feedback boundaries](feedback.md).
 
-Projects are trusted local executable HTML, not an untrusted-content sandbox. Localhost binding and containment do not provide remote authentication or isolate scripts between authorized projects. No remote project URL, upload, filesystem browser or write API is provided.
+Projects are trusted local executable HTML, not an untrusted-content sandbox. Localhost binding and containment do not provide remote authentication or isolate scripts between authorized projects. No remote project URL, upload or filesystem browser is provided. The only write API is constrained, versioned feedback in the CLI-authorized workspace, with same-origin/size/schema checks, atomic replacement and expected-revision conflict detection. Historical artifacts remain immutable.
 
 ## Scope and limits
 
-- Read-only preview: no shot editing, drag-and-drop, narration generation, live video or transitions.
+- Source remains read-only: no clip trimming, shot editing, drag-and-drop editor, narration generation, live video or transitions. Review feedback is editable separately.
 - Studio supports empty projects with a recovery message. Export and review target one selected nonempty scene at a time; multi-scene projects require `--scene`. Duplicate shot IDs are allowed across scenes, not within a scene. Generic `scene` and `shot` compositions receive the selected scene and video settings through input props.
 - Cross-machine pixel identity is not guaranteed; see [ADR 0001](adr/0001-renderer.md).
 - The theme is fixed; there is no toggle.
@@ -72,4 +77,4 @@ bun run validate
 bun run render
 ```
 
-Representative screenshots are in `docs/screenshots/`. The Phase 1 verification results are in [studio-phase1-report.md](studio-phase1-report.md).
+Historical screenshots are in `docs/screenshots/`. See [Phase 4 architecture](phase4-architecture.md), [motion helpers](motion.md) and [Phase 4 verification](phase4-report.md) for the current workflow.

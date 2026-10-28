@@ -7,6 +7,8 @@
     "validate": "bun scripts/validate.ts",
     "hash": "bun scripts/hash.ts",
     "review": "bun scripts/review.ts",
+    "review:feedback": "bun scripts/feedback.ts",
+    "production": "bun scripts/production.ts",
     "studio": "bun scripts/studio.ts",
     "test": "bun test",
     "typecheck": "tsc --noEmit"

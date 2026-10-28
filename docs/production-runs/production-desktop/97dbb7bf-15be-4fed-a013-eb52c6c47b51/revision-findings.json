@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "sourceSha256": "fc3bf467357f0d2269aebb4fad2fbf7964389613cdfa13a8eb7ca309541a98e8",
+  "candidateSha256": "801b6f12b23c852914db3ebba13514121ed84a5ba1d5c498e7a14d45efbe6464",
+  "reviewer": {"kind":"agent","name":"GPT-6.1 Sol"},
+  "decision": "needs-revision",
+  "findings": [{
+    "id":"cursor-static-position",
+    "severity":"blocking",
+    "sceneId":"desk",
+    "shotId":"workspace",
+    "frame":54,
+    "status":"open",
+    "description":"The visible arrow tip is 56px below its intended contact because an absolutely positioned cursor inherited a static position below the menu bar. The title-bar grip is similarly displaced.",
+    "correction":"Set explicit left:0 and top:0 on #pointer. Assert rendered cursor bounds against the target and window, not just its data coordinates. Recapture and rerender before acceptance.",
+    "limits":"Observed in retained identical-hash captures from the preceding failed technical run, and reproduced by a rendered-bounds test: expected y263, received y319. This prepared run has the same PNG and video hashes. No publication or cleanup is authorized. Sound was measured, not heard."
+  }]
+}

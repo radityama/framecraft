@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "final": {
+    "path": "output/production-desktop/final/desk-cbf0fd43-ebcc-48dc-a8b7-e1c1d33361c7.mp4",
+    "sha256": "985829bf6f16ffafc6467a856209753facc61c4891f33294399864e8c9867058",
+    "bytes": 1230072,
+    "hardLinks": 1,
+    "directoryEntries": [
+      "desk-cbf0fd43-ebcc-48dc-a8b7-e1c1d33361c7.mp4"
+    ]
+  },
+  "sourceSha256": "23e90401730bde057f7d1c0dba30cd4b62684fe958625e64e494fc6d73af0046",
+  "currentRun": {
+    "ownedFiles": 41,
+    "removedFiles": 41,
+    "removedBytes": 6763426,
+    "remainingScratchFiles": 0,
+    "preserved": [],
+    "failures": []
+  },
+  "archivedFrames": 40,
+  "preservedDiagnosticRuns": [
+    {
+      "runId": "bb9317bd-69c7-4dfd-9550-964b54757d9b",
+      "status": "failed",
+      "files": 41,
+      "bytes": 6764051,
+      "allHashesMatch": true
+    },
+    {
+      "runId": "97dbb7bf-15be-4fed-a013-eb52c6c47b51",
+      "status": "prepared",
+      "files": 41,
+      "bytes": 6764051,
+      "allHashesMatch": true
+    }
+  ],
+  "logsArchived": [
+    "baseline-tests.log",
+    "regression.log",
+    "regression-final.log",
+    "focused-final.log",
+    "typecheck-final.log",
+    "publish.log",
+    "cleanup-repeat.log",
+    "prepare-corrected.log"
+  ]
+}

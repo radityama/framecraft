@@ -1,0 +1,305 @@
+{
+  "schemaVersion": 1,
+  "projectId": "production-desktop",
+  "sceneId": "desk",
+  "runId": "bb9317bd-69c7-4dfd-9550-964b54757d9b",
+  "sourceSha256": "fc3bf467357f0d2269aebb4fad2fbf7964389613cdfa13a8eb7ca309541a98e8",
+  "status": "failed",
+  "owned": [
+    {
+      "path": "screenshots/workspace-local-0000-global-0000.png",
+      "kind": "preview",
+      "bytes": 135015,
+      "sha256": "81e7f5df975f48a5c229b4e038151a09acb21ee0e8181d750363598018aee651",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0026-global-0026.png",
+      "kind": "preview",
+      "bytes": 135034,
+      "sha256": "be31adfd754db0ea469a3783151088471957774c87888ccecfbdd9886651c946",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0053-global-0053.png",
+      "kind": "preview",
+      "bytes": 134998,
+      "sha256": "b1b0b392357440134db55e8b485d33b1963996d2907408382912e904071e636c",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0054-global-0054.png",
+      "kind": "preview",
+      "bytes": 134893,
+      "sha256": "883386628b25e75038c35825c7f423a201f962563f59ce6c66213fb22ac24a26",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0055-global-0055.png",
+      "kind": "preview",
+      "bytes": 134893,
+      "sha256": "883386628b25e75038c35825c7f423a201f962563f59ce6c66213fb22ac24a26",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0056-global-0056.png",
+      "kind": "preview",
+      "bytes": 134893,
+      "sha256": "883386628b25e75038c35825c7f423a201f962563f59ce6c66213fb22ac24a26",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0057-global-0057.png",
+      "kind": "preview",
+      "bytes": 143267,
+      "sha256": "9cfd64153b74a3eed0ed30c28e0b560de26c5901877330114f033c52e7f9a12e",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0058-global-0058.png",
+      "kind": "preview",
+      "bytes": 143267,
+      "sha256": "9cfd64153b74a3eed0ed30c28e0b560de26c5901877330114f033c52e7f9a12e",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0074-global-0074.png",
+      "kind": "preview",
+      "bytes": 143267,
+      "sha256": "9cfd64153b74a3eed0ed30c28e0b560de26c5901877330114f033c52e7f9a12e",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0095-global-0095.png",
+      "kind": "preview",
+      "bytes": 143267,
+      "sha256": "9cfd64153b74a3eed0ed30c28e0b560de26c5901877330114f033c52e7f9a12e",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0096-global-0096.png",
+      "kind": "preview",
+      "bytes": 140215,
+      "sha256": "66a285df56f6c647c58c3b1219e4d462c33079f090042346e7f421768a28c039",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0112-global-0112.png",
+      "kind": "preview",
+      "bytes": 140872,
+      "sha256": "81836c12a65536cf414ae122919194890d32c186d54e68a0b6b5bc01e00967d5",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0134-global-0134.png",
+      "kind": "preview",
+      "bytes": 141986,
+      "sha256": "b97c23d91284908856dbdfd3b3e58c2597ea1d72f64265b5b16e6a7c6dd4e49a",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0145-global-0145.png",
+      "kind": "preview",
+      "bytes": 142793,
+      "sha256": "de09005484b32d74282bab3d3349ebc5a1c0dab3a388486016d0ce55bc86a941",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0159-global-0159.png",
+      "kind": "preview",
+      "bytes": 143046,
+      "sha256": "ef0dce52cfd44f1e2a3391fd8db6d697582bcf3fa1ad6ec5376dd8c61e6c0349",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0173-global-0173.png",
+      "kind": "preview",
+      "bytes": 143046,
+      "sha256": "ef0dce52cfd44f1e2a3391fd8db6d697582bcf3fa1ad6ec5376dd8c61e6c0349",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0174-global-0174.png",
+      "kind": "preview",
+      "bytes": 143046,
+      "sha256": "ef0dce52cfd44f1e2a3391fd8db6d697582bcf3fa1ad6ec5376dd8c61e6c0349",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0196-global-0196.png",
+      "kind": "preview",
+      "bytes": 143113,
+      "sha256": "ff58e9e1cfcfb91d2e00052d6d04d13a698a9cae3dbd80f71027635479b5f00c",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0211-global-0211.png",
+      "kind": "preview",
+      "bytes": 143691,
+      "sha256": "8425572920e03e72829eeb5fa8e5e27455f190ec2014b02cd2be9f22db7f69b7",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0212-global-0212.png",
+      "kind": "preview",
+      "bytes": 143079,
+      "sha256": "8c9593481c392f12948b62787b5fa11ddb622465ff525339166700b5624a19d0",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0213-global-0213.png",
+      "kind": "preview",
+      "bytes": 143079,
+      "sha256": "8c9593481c392f12948b62787b5fa11ddb622465ff525339166700b5624a19d0",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0214-global-0214.png",
+      "kind": "preview",
+      "bytes": 143079,
+      "sha256": "8c9593481c392f12948b62787b5fa11ddb622465ff525339166700b5624a19d0",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0215-global-0215.png",
+      "kind": "preview",
+      "bytes": 143079,
+      "sha256": "8c9593481c392f12948b62787b5fa11ddb622465ff525339166700b5624a19d0",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0219-global-0219.png",
+      "kind": "preview",
+      "bytes": 143079,
+      "sha256": "8c9593481c392f12948b62787b5fa11ddb622465ff525339166700b5624a19d0",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0220-global-0220.png",
+      "kind": "preview",
+      "bytes": 143079,
+      "sha256": "8c9593481c392f12948b62787b5fa11ddb622465ff525339166700b5624a19d0",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0224-global-0224.png",
+      "kind": "preview",
+      "bytes": 144558,
+      "sha256": "93de72f8eefeb4a330567caa82e49891bcd87a4c581a6aab2cda51e3772cc6d1",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0261-global-0261.png",
+      "kind": "preview",
+      "bytes": 132680,
+      "sha256": "0a9ac58c3e66c8b991d32adb8604d5a08d01869b2424e5f1c1aa968a999c51c9",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0286-global-0286.png",
+      "kind": "preview",
+      "bytes": 131951,
+      "sha256": "245b49b926ea901206fcd2220de484da8df5d8c8684f620470379f1dde452dc6",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0287-global-0287.png",
+      "kind": "preview",
+      "bytes": 131951,
+      "sha256": "245b49b926ea901206fcd2220de484da8df5d8c8684f620470379f1dde452dc6",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0288-global-0288.png",
+      "kind": "preview",
+      "bytes": 132515,
+      "sha256": "43ea3642d461fc3422d2256812575bf2b41f985cbf0803160ac915352b0ba01e",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0289-global-0289.png",
+      "kind": "preview",
+      "bytes": 132515,
+      "sha256": "43ea3642d461fc3422d2256812575bf2b41f985cbf0803160ac915352b0ba01e",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0290-global-0290.png",
+      "kind": "preview",
+      "bytes": 132515,
+      "sha256": "43ea3642d461fc3422d2256812575bf2b41f985cbf0803160ac915352b0ba01e",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0291-global-0291.png",
+      "kind": "preview",
+      "bytes": 132515,
+      "sha256": "43ea3642d461fc3422d2256812575bf2b41f985cbf0803160ac915352b0ba01e",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0303-global-0303.png",
+      "kind": "preview",
+      "bytes": 131953,
+      "sha256": "3e4533366c15c2be13615f64c75b88be9ae4ba33b231ea2060083e05aee56044",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0304-global-0304.png",
+      "kind": "preview",
+      "bytes": 131943,
+      "sha256": "aca88091372d673a84b3f4d6ea51f0e1058a592b49efb7a817e0ff3efaaf7448",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0336-global-0336.png",
+      "kind": "preview",
+      "bytes": 135530,
+      "sha256": "d57d1359e7c84dc07edeb5a3f42f3bdcf14dc207ea7a56f20ece7d33ed47930f",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0348-global-0348.png",
+      "kind": "preview",
+      "bytes": 136164,
+      "sha256": "4a1dfa3edfd9374cea6853536f27e4cbac436908b8730274a3b9d2b2b8b0d795",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0370-global-0370.png",
+      "kind": "preview",
+      "bytes": 134925,
+      "sha256": "a392a343e62f1b11e4443e3aacc2622fd47f188400c920138cc11fe0354521b5",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0376-global-0376.png",
+      "kind": "preview",
+      "bytes": 134925,
+      "sha256": "a392a343e62f1b11e4443e3aacc2622fd47f188400c920138cc11fe0354521b5",
+      "removed": false
+    },
+    {
+      "path": "screenshots/workspace-local-0449-global-0449.png",
+      "kind": "preview",
+      "bytes": 134925,
+      "sha256": "a392a343e62f1b11e4443e3aacc2622fd47f188400c920138cc11fe0354521b5",
+      "removed": false
+    },
+    {
+      "path": "candidate.mp4",
+      "kind": "draft-video",
+      "bytes": 1229410,
+      "sha256": "801b6f12b23c852914db3ebba13514121ed84a5ba1d5c498e7a14d45efbe6464",
+      "removed": false
+    }
+  ],
+  "published": null,
+  "cleanup": {
+    "filesRemoved": 0,
+    "bytesReclaimed": 0,
+    "preserved": [],
+    "failures": []
+  },
+  "failure": "Error: media command failed (234): [AVFormatContext @ 0x5563bcf30ac0] Requested output format 's16le' is not known.\n[out#0 @ 0x5563bcf6d140] Error initializing the muxer for pipe:: Invalid argument\nError opening output file -.\nError opening output files: Invalid argument\n"
+}

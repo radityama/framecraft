@@ -1,5 +1,7 @@
 # Rendering selected projects and scenes
 
+Production acceptance uses [the production standard](production-standard.md) and `bun run production`; the commands below remain contract-free diagnostics. The isolated `projects/production-desktop` / `desk` acceptance scene contains one `workspace` shot, **450 frames / 15 seconds at 30fps**, with event-mapped original tactile SFX and no voice or music. Its final export is published under `output/production-desktop/final/`; permanent review and cleanup records live under `docs/production-runs/production-desktop/`.
+
 On Linux, install [Bun](https://bun.sh/) 1.4.3, then run:
 
 ```sh
@@ -37,6 +39,9 @@ The generic Remotion compositions are `scene` and `shot`, not project-specific I
 | demo / intro | 1920×1080, 30 fps | title 60, diagram 90, close 60, commit 120 | 330 frames, 11 s |
 | showcase / pulse | 960×540, 30 fps | opening 48, echo 48 | 96 frames, 3.2 s |
 | showcase / signal | 960×540, 30 fps | carrier 48, receive 48 | 96 frames, 3.2 s |
+| motion / examples | 640×360, 30 fps | cursor 90, window 90, type 90, camera 90 | 360 frames, 12 s |
+| motion-benchmark-02 / film | 1920×1080, 30 fps | wake 360, desktop 450, story 450, resolve 390 | 1650 frames, 55 s |
+| production-desktop / desk | 1920×1080, 30 fps | workspace 450 | 450 frames, 15 s |
 
 The showcase uses its own runtime, local licensed fonts, SVG and CC0 diagnostic WAVs. If recreating the WAVs, run `bun projects/showcase/assets/audio/generate.ts`. Both scenes use zero-overlap cuts. Default filenames retain demo compatibility (`intro.mp4`, `title-0.png`); other scenes use project/scene-qualified names such as `showcase-signal.mp4` and `showcase-signal-carrier-0.png`. Render/hash destinations inside the selected project, including directory symlink aliases, are refused to protect source assets. All commands accept `--help`.
 

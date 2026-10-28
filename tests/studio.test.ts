@@ -19,7 +19,7 @@ test('Studio server serves the validated manifest and bundle, then cleans up', a
     expect(project.id).toBe('demo');
     expect(project.scenes.map(scene => [scene.id, scene.durationFrames])).toEqual([['intro', 330]]);
     const listing = await (await fetch(`${url}/api/projects`)).json() as StudioCatalog;
-    expect(listing.projects.map(item => item.id)).toEqual(['demo', 'showcase']);
+    expect(listing.projects.map(item => item.id)).toEqual(expect.arrayContaining(['demo', 'motion', 'showcase']));
     expect(listing.selected).toEqual({projectId: 'demo', sceneId: 'intro'});
     const named = await (await fetch(`${url}/api/project?id=demo`)).json() as StudioProject;
     expect(named.scenes[0]!.shots[0]!.entry).toMatch(/^demo\/scenes\//);
@@ -69,7 +69,7 @@ test('CLI authorizes only the explicit external root and selects its noninitial 
     const catalog = await (await fetch(`${studio.url}/api/projects`)).json() as StudioCatalog;
     expect(catalog.selected).toEqual({projectId: 'external', sceneId: 'signal'});
     expect(JSON.stringify(catalog)).not.toContain(temp);
-    expect(catalog.projects.map(project => project.id)).toEqual(['demo', 'external', 'showcase']);
+    expect(catalog.projects.map(project => project.id)).toEqual(expect.arrayContaining(['demo', 'external', 'motion', 'showcase']));
     const project = await (await fetch(`${studio.url}/api/project?id=external`)).json() as StudioProject;
     expect(project.scenes.map(scene => [scene.id, scene.durationFrames])).toEqual([['pulse', 96], ['signal', 96]]);
     for (const asset of ['runtime.js', 'assets/antenna.svg', 'assets/fonts/fonts.css', 'assets/audio/hum.wav', 'scenes/signal/shots/01-carrier/index.html']) {

@@ -1,0 +1,16 @@
+{
+  "id": "desk", "title": "A little room to think",
+  "shots": [{"id": "workspace", "entry": "shots/01-workspace/index.html", "durationFrames": 450, "overlapFrames": 0}],
+  "audio": {"schemaVersion": 1, "cues": [
+    {"id":"open-press","src":"assets/audio/open-press.wav","startFrame":54,"durationFrames":3,"trimOutFrames":3,"gain":0.30,"fadeOutFrames":1},
+    {"id":"open-release","src":"assets/audio/open-release.wav","startFrame":57,"durationFrames":3,"trimOutFrames":3,"gain":0.25,"fadeOutFrames":1},
+    {"id":"typing","src":"assets/audio/typing.wav","startFrame":96,"durationFrames":52,"trimOutFrames":52,"gain":0.27,"fadeOutFrames":1},
+    {"id":"confirm","src":"assets/audio/confirm.wav","startFrame":159,"durationFrames":4,"trimOutFrames":4,"gain":0.28,"fadeOutFrames":1},
+    {"id":"grip-press","src":"assets/audio/grip-press.wav","startFrame":212,"durationFrames":2,"trimOutFrames":2,"gain":0.27,"fadeOutFrames":1},
+    {"id":"grab","src":"assets/audio/grab.wav","startFrame":214,"durationFrames":5,"trimOutFrames":5,"gain":0.26,"fadeOutFrames":1},
+    {"id":"drag","src":"assets/audio/drag.wav","startFrame":220,"durationFrames":67,"trimOutFrames":67,"gain":0.32,"fadeInFrames":2,"fadeOutFrames":2},
+    {"id":"grip-release","src":"assets/audio/grip-release.wav","startFrame":288,"durationFrames":2,"trimOutFrames":2,"gain":0.22,"fadeOutFrames":1},
+    {"id":"drop","src":"assets/audio/drop.wav","startFrame":290,"durationFrames":8,"trimOutFrames":8,"gain":0.29,"fadeOutFrames":2},
+    {"id":"camera-paper","src":"assets/audio/camera-paper.wav","startFrame":304,"durationFrames":12,"trimOutFrames":12,"gain":0.22,"fadeInFrames":1,"fadeOutFrames":2}
+  ]}
+}

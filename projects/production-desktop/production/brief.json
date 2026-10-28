@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1, "projectId": "production-desktop", "sceneId": "desk",
+  "audience": "Viewers evaluating whether Framecraft can depict a credible, quiet desktop task with causal motion and local tactile sound.",
+  "message": "Small, deliberate actions make a working space feel settled.",
+  "format": "desktop-simulation",
+  "references": ["Original exercise, not a client product. Observe conventional desktop title bars, focused rename fields, active-window stacking and cursor-to-window grip geometry; do not clone a branded OS."],
+  "narrative": "Establish a working desktop, create and name a folder, move its window with an attached hand cursor, then settle the camera and hold the result.",
+  "constraints": ["A labeled desktop simulation, not a working application or product claim.", "No remote assets, narration or music.", "Exact frame-driven states and variable typing cadence.", "Subjective listening remains pending if unavailable; no automatic human approval."],
+  "design": {
+    "palette": ["Warm paper #ebe8df for a quiet desk", "Ink #252d2c for readable structure", "Muted rust #a14323 only for active focus"],
+    "typography": "Local IBM Plex Sans for familiar, legible task controls; IBM Plex Serif for the two short editorial statements, adding a quiet printed-desk character. ENERGY 1 / RHYTHM 2 / MOTION 2.",
+    "composition": "A persistent desktop with menu bar, overlapping windows, sidebar, file table and restrained elevation. The active window is the focal plane; no floating feature cards. The caption occupies the clear lower margin, outside the camera crop.",
+    "motion": "Approach and settle before a press; release causes folder creation and focus. Variable key cadence resolves before confirmation. Preserve the title-bar grip throughout drag, release before the drop accent, and make one restrained camera move followed by a long reading hold."
+  },
+  "audio": {"sfx":"required","silenceReason":null,"narration":{"enabled":false,"authorization":null},"music":{"enabled":false,"authorization":null}},
+  "review": {"humanApprovalRequired": false}
+}

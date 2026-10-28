@@ -1,0 +1,124 @@
+bun test v1.4.4 (38afee6c8)
+killed 1 dangling process
+
+tests/spike.test.ts:
+(fail) missing acknowledgement times out [5000.41ms]
+  ^ this test timed out after 5000ms.
+88 |   await page.evaluate(() => (window as any).mount('/tests/fixtures/silent.html', {id:'silent',fps:30,durationFrames:90,width:1920,height:1080}));
+89 |   await expect(page.evaluate(() => (window as any).seek(10))).rejects.toThrow('Timeout waiting for rendered 10');
+90 | });
+91 | 
+92 | test('shot clocks and random calls repeat on reverse seek', async () => {
+93 |   await page.evaluate(() => (window as any).mount('/tests/fixtures/deterministic.html', {id:'clock',fps:30,durationFrames:90,width:1920,height:1080}));
+                  ^
+error: evaluate: Target page, context or browser has been closed
+ log: [],
+
+      at /home/radityra/projects/framecraft/tests/spike.test.ts:93:14
+      at /home/radityra/projects/framecraft/tests/spike.test.ts:89:71
+(fail) shot clocks and random calls repeat on reverse seek [4.76ms]
+110 |   const mount = (durationFrames: number) => page.evaluate(durationFrames => (window as any).mount('/tests/fixtures/deterministic.html', {id:'progress',fps:30,durationFrames,width:1920,height:1080}), durationFrames);
+111 |   const progress = async (frame: number) => {
+112 |     await page.evaluate(frame => (window as any).seek(frame), frame);
+113 |     return JSON.parse(await page.frameLocator('iframe').locator('body').innerText()).progress;
+114 |   };
+115 |   await mount(3);
+              ^
+error: evaluate: Target page, context or browser has been closed
+ log: [],
+
+      at /home/radityra/projects/framecraft/tests/spike.test.ts:115:9
+(fail) progress includes first, midpoint and final frames including a single-frame shot [1.48ms]
+119 |   await mount(1);
+120 |   expect(await progress(0)).toBe(1);
+121 | });
+122 | 
+123 | test('registered and legacy timelines seek to the same local time', async () => {
+124 |   await page.evaluate(() => (window as any).mount('/tests/fixtures/timelines.html', {id:'timeline',fps:30,durationFrames:90,width:1920,height:1080}));
+                   ^
+error: evaluate: Target page, context or browser has been closed
+ log: [],
+
+      at /home/radityra/projects/framecraft/tests/spike.test.ts:124:14
+(fail) registered and legacy timelines seek to the same local time [1.34ms]
+130 |   expect(await read(10)).toEqual({registered: String(10 / 30), legacy: String(10 / 30)});
+131 |   expect(await read(70)).toEqual({registered: String(70 / 30), legacy: String(70 / 30)});
+132 | });
+133 | 
+134 | test('render acknowledgement waits for fonts, image decode and two native animation frames', async () => {
+135 |   await page.evaluate(() => (window as any).mount('/tests/fixtures/settling.html', {id:'settling',fps:30,durationFrames:3,width:1920,height:1080}));
+                   ^
+error: evaluate: Target page, context or browser has been closed
+ log: [],
+
+      at /home/radityra/projects/framecraft/tests/spike.test.ts:135:14
+(fail) render acknowledgement waits for fonts, image decode and two native animation frames [2.64ms]
+157 | 
+158 | test('first frame waits for a real, late local font before acknowledging', async () => {
+159 |   const requested = new Promise<void>(resolve => { fontRequested = resolve; });
+160 |   fontRequest = new Promise<void>(resolve => { releaseFont = resolve; });
+161 |   try {
+162 |     await page.evaluate(() => (window as any).mount('/tests/fixtures/late-font.html', {id:'late',fps:30,durationFrames:3,width:1920,height:1080}));
+                     ^
+error: evaluate: Target page, context or browser has been closed
+ log: [],
+
+      at /home/radityra/projects/framecraft/tests/spike.test.ts:162:16
+(fail) first frame waits for a real, late local font before acknowledging [1.56ms]
+178 |     expect((await page.locator('iframe').screenshot()).equals(first)).toBe(true);
+179 |   } finally { releaseFont?.(); fontRequest = undefined; }
+180 | });
+181 | 
+182 | test('overlapping seeks apply only the last frame and never acknowledge a stale seek', async () => {
+183 |   await page.evaluate(() => (window as any).mount('/tests/fixtures/overlap.html', {id:'overlap',fps:30,durationFrames:3,width:1920,height:1080}));
+                   ^
+error: evaluate: Target page, context or browser has been closed
+ log: [],
+
+      at /home/radityra/projects/framecraft/tests/spike.test.ts:183:14
+(fail) overlapping seeks apply only the last frame and never acknowledge a stale seek [0.75ms]
+
+tests/studio.test.ts:
+17 |     expect(manifest.status).toBe(200);
+18 |     const project = await manifest.json() as StudioProject;
+19 |     expect(project.id).toBe('demo');
+20 |     expect(project.scenes.map(scene => [scene.id, scene.durationFrames])).toEqual([['intro', 330]]);
+21 |     const listing = await (await fetch(`${url}/api/projects`)).json() as StudioCatalog;
+22 |     expect(listing.projects.map(item => item.id)).toEqual(['demo', 'motion', 'showcase']);
+                                                       ^
+error: expect(received).toEqual(expected)
+
+@@ -3,2 +3,3 @@
+    "motion",
++   "motion-benchmark-02",
+    "showcase",
+
+- Expected  - 0
++ Received  + 1
+
+      at <anonymous> (/home/radityra/projects/framecraft/tests/studio.test.ts:22:51)
+(fail) Studio server serves the validated manifest and bundle, then cleans up [4005.34ms]
+67 |   const studio = await startStudio(['--project', join(temp, 'alias'), '--scene', 'signal'], {TMPDIR: temp});
+68 |   try {
+69 |     const catalog = await (await fetch(`${studio.url}/api/projects`)).json() as StudioCatalog;
+70 |     expect(catalog.selected).toEqual({projectId: 'external', sceneId: 'signal'});
+71 |     expect(JSON.stringify(catalog)).not.toContain(temp);
+72 |     expect(catalog.projects.map(project => project.id)).toEqual(['demo', 'external', 'motion', 'showcase']);
+                                                             ^
+error: expect(received).toEqual(expected)
+
+@@ -4,2 +4,3 @@
+    "motion",
++   "motion-benchmark-02",
+    "showcase",
+
+- Expected  - 0
++ Received  + 1
+
+      at <anonymous> (/home/radityra/projects/framecraft/tests/studio.test.ts:72:57)
+(fail) CLI authorizes only the explicit external root and selects its noninitial scene [3001.68ms]
+
+ 101 pass
+ 9 fail
+ 839 expect() calls
+Ran 110 tests across 26 files. [305.50s]

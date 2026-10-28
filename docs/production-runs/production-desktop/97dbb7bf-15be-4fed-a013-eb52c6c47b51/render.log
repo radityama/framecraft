@@ -1,0 +1,4 @@
+bun run render: exit 0
+production-desktop-desk render: 450 frames at 1920x1080/30fps, 1229410 bytes, 47.60s
+[run scratch; see ownership and frame metadata]/candidate.mp4
+$ bun scripts/spike.ts render --project /home/radityra/projects/framecraft/projects/production-desktop --scene desk --output "[run scratch; see ownership and frame metadata]/candidate.mp4"

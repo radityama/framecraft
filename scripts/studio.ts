@@ -6,6 +6,7 @@ import {discoverProjects} from '../src/spike/registry';
 import {projectRoot, selectScene} from '../src/spike/selection';
 import type {StudioProject} from '../src/spike/project';
 import type {StudioCatalog} from '../src/studio/catalog';
+import {createReviewApi} from '../src/studio/review-api';
 
 const idPattern = /^[a-z0-9][a-z0-9-]*$/;
 
@@ -25,22 +26,29 @@ function browserProject(project: StudioProject): StudioProject {
 
 async function main() {
   if (Bun.argv.slice(2).includes('--help')) {
-    console.log('Usage: bun run studio [--project <path>] [--scene <id>]\nDefaults to demo/intro. --project also authorizes one external project. URL IDs override the initial selection.');
+    console.log('Usage: bun run studio [--project <path>] [--scene <id>] [--workspace <path>] [--review <capture-directory>]...\nDefaults to demo/intro. Feedback lives in output/studio-workspace, outside source and immutable captures.');
     return;
   }
   let projectArg: string | undefined;
   let sceneArg: string | undefined;
+  let workspaceArg: string | undefined;
+  const reviews: string[] = [];
   for (let index = 0; index < Bun.argv.length - 2; index++) {
     const flag = Bun.argv[index + 2];
-    if (flag !== '--project' && flag !== '--scene') throw new Error(`Unknown option: ${flag}`);
+    if (!['--project', '--scene', '--workspace', '--review'].includes(flag!)) throw new Error(`Unknown option: ${flag}`);
     const value = Bun.argv[++index + 2];
     if (!value || value.startsWith('--')) throw new Error(`${flag} requires a value`);
     if (flag === '--project') {
       if (projectArg !== undefined) throw new Error('--project specified twice');
       projectArg = value;
-    } else {
+    } else if (flag === '--scene') {
       if (sceneArg !== undefined) throw new Error('--scene specified twice');
       sceneArg = value;
+    } else if (flag === '--workspace') {
+      if (workspaceArg !== undefined) throw new Error('--workspace specified twice');
+      workspaceArg = value;
+    } else {
+      reviews.push(value);
     }
   }
   const registry = await discoverProjects(resolve(import.meta.dir, '../projects'), projectArg ? await projectRoot(projectArg) : undefined);
@@ -55,6 +63,7 @@ async function main() {
     scenes: project.scenes.map(({id, title, durationFrames}) => ({id, title, durationFrames})),
   })), warnings: registry.warnings, selected: {projectId: selected.project.id, sceneId: selectedScene?.id ?? null}};
   const demo = registry.projects.get('demo');
+  const reviewApi = await createReviewApi(registry, workspaceArg ?? 'output/studio-workspace', reviews);
   const bundleDir = await mkdtemp(join(tmpdir(), 'framecraft-studio-'));
   try {
   const outDir = join(bundleDir, 'studio');
@@ -86,6 +95,9 @@ async function main() {
     port,
     async fetch(request) {
       const url = new URL(request.url);
+      if (url.hostname !== '127.0.0.1') return new Response('Forbidden host', {status: 403});
+      const reviewResponse = await reviewApi(request, url);
+      if (reviewResponse) return reviewResponse;
       let pathname: string;
       try { pathname = decodeURIComponent(url.pathname); }
       catch { return new Response('Bad path', {status: 400}); }

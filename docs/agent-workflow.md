@@ -1,5 +1,7 @@
 # Agent workflow for a selected scene
 
+For production work, read [the production standard](production-standard.md) first. Its brief, event/cue contracts, independent gates and verified-publication cleanup supplement these diagnostic steps; a capture or successful encode is not creative or human approval.
+
 Any repository-aware coding agent can read `AGENTS.md` and the six local `skills/framecraft-*/SKILL.md` Markdown guides directly. No provider-specific skill installation or MCP server is required. Select one validated project and scene for authoring, review and export. The commands below default to `projects/demo`/`intro`; for `projects/showcase`/`pulse`, add `--project projects/showcase --scene pulse` to `validate`, `snap`, `review`, `render` and `studio`. Multi-scene projects need an explicit scene for scene-specific commands.
 
 1. Inspect the chosen project's `project.json` and its selected `scene.json` for size, frame rate, order, cuts and audio.
@@ -9,6 +11,6 @@ Any repository-aware coding agent can read `AGENTS.md` and the six local `skills
 5. Run `bun run validate` with the selected project; all its scenes are validated even with `--scene`. Resolve warnings and errors without mistaking a passing scan for visual approval.
 6. Capture to a fresh directory with `bun run review --output <new-directory> --milestone <shot:local-frame>` (repeat milestones as needed).
 7. Open **each** PNG listed in the manifest, including first/last frames and both sides of each cut; note legibility, motion states, cropping and defects by shot/frame.
-8. Fix only observed defects against the requirements; preserve prior artifacts, recapture to another new directory, and re-inspect all its PNGs.
+8. Record precise frame/source feedback in Studio or portable JSON/Markdown (see `docs/feedback.md`). Fix only observed defects; preserve prior artifacts, recapture to a new directory, compare exact matched frames and re-inspect all its PNGs. Optional deterministic helpers and standalone examples are documented in `docs/motion.md`.
 9. After inspection, edit only the manifest `review` section with status, named reviewer, findings and notes; run `bun run review --summary <manifest>` then `bun run review --check <manifest>`. These commands do not automatically accept quality.
 10. Run `bun run render`; inspect the MP4 and probe its video/audio streams using `docs/rendering.md`. Use `docs/audio.md` for supplied local sound and optional narration. Report checks not performed.

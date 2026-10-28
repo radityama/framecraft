@@ -51,5 +51,5 @@ export function ShotView({id, entry, durationFrames, fps, width, height}: Props)
     };
   }, [id, frame, fps, durationFrames, width, height, initial]);
 
-  return <IFrame ref={iframe} src={staticFile(entry)} style={{width, height, border: 0}} />;
+  return <IFrame ref={iframe} data-framecraft-shot-id={id} src={staticFile(entry)} style={{width, height, border: 0}} />;
 }

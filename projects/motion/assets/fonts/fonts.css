@@ -1,0 +1,22 @@
+/* Latin WOFF2 files from Google Fonts, licensed under the OFL texts alongside them. */
+@font-face {
+  font-family: "IBM Plex Serif";
+  src: url("./ibm-plex-serif-latin-400.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+}
+@font-face {
+  font-family: "IBM Plex Sans";
+  src: url("./ibm-plex-sans-latin.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: block;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("./jetbrains-mono-latin.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: block;
+}

@@ -69,7 +69,7 @@ test('seeks across shot boundaries and matches the renderer at repeated frames',
     expect(Buffer.compare(first, middle)).not.toBe(0);
     expect(Buffer.compare(middle, again)).toBe(0);
 
-    await page.getByRole('button', {name: /commit/}).click();
+    await page.locator('.shots').getByRole('button', {name: /commit/}).click();
     await ready(page, 210);
     expect(await stage(page).getAttribute('data-shot')).toBe('commit');
     expect(await page.locator('.shots button[data-active="true"]').innerText()).toMatch(/commit/);
@@ -213,7 +213,7 @@ test('real catalog project/scene/shot navigation survives refresh and history wi
     await page.getByLabel('Scene', {exact: true}).selectOption('signal');
     await ready(page, 0);
     expect(await stage(page).getAttribute('data-scene')).toBe('signal');
-    await page.getByRole('button', {name: /receive/}).click();
+    await page.locator('.shots').getByRole('button', {name: /receive/}).click();
     await ready(page, 48);
     expect(new URL(page.url()).search).toBe('?project=showcase&scene=signal&shot=receive');
     expect(await page.frameLocator('iframe').locator('h1').evaluate(node => Number(getComputedStyle(node).opacity))).toBeGreaterThanOrEqual(0.6);
@@ -361,7 +361,7 @@ test('catalog errors, empty state and skipped-project disclosure are keyboard re
     await disclosure.focus();
     await page.keyboard.press('Enter');
     await page.getByText(/invalid-fixture:/).waitFor({state: 'visible'});
-    expect(await page.locator('details').getAttribute('open')).not.toBeNull();
+    expect(await page.locator('details.fault').getAttribute('open')).not.toBeNull();
     const fonts = await page.evaluate(() => Array.from(document.fonts).filter(font => font.status === 'loaded').map(font => font.family));
     expect(fonts).toContain('IBM Plex Sans');
     expect(fonts).toContain('JetBrains Mono');

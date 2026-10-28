@@ -3,7 +3,11 @@ import React from 'react';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {SceneComposition} from '../spike/composition';
 import type {Shot, StudioProject} from '../spike/project';
-import {activeShot, formatTime} from './frame';
+import {activeShot, formatTime, clampFrame, adjacentShotFrame, shotFrameToSceneFrame} from '../timeline';
+import {Timeline} from './Timeline';
+import {AnnotationOverlay, ReviewPanel, useReview} from './ReviewPanel';
+import {Comparison} from './Comparison';
+import type {Geometry} from '../review/feedback';
 import {routeFromSearch, routeSearch, type StudioCatalog, type StudioRoute} from './catalog';
 
 type Status = 'loading' | 'ready' | 'seeking' | 'error';
@@ -20,17 +24,23 @@ export function Studio() {
   const [route, setRoute] = useState(routeFromUrl);
   const [frame, setFrame] = useState(0);
   const [playing, setPlaying] = useState(false);
+  const [rate, setRate] = useState(1);
+  const [zoom, setZoom] = useState(1);
+  const [geometry, setGeometry] = useState<Geometry>();
+  const [annotationMode, setAnnotationMode] = useState<'none' | 'point' | 'rectangle'>('none');
   const [status, setStatus] = useState<Status>('loading');
   const [notice, setNotice] = useState('Loading preview…');
   const player = useRef<PlayerRef>(null);
   const pending = useRef<number | null>(0);
   const confirmed = useRef<number | null>(null);
   const frameRef = useRef(0);
+  const previewSource = useRef<{key: string; sha: string} | undefined>(undefined);
   const projectId = route.project ?? catalog?.selected.projectId;
   const summary = catalog?.projects.find(candidate => candidate.id === projectId);
   const sceneId = route.scene ?? (projectId === catalog?.selected.projectId ? catalog?.selected.sceneId : undefined) ?? summary?.scenes[0]?.id;
   const project = loaded && loaded.id === projectId ? loaded.project : undefined;
   const scene = project?.scenes.find(candidate => candidate.id === sceneId);
+  const review = useReview(project?.id, scene?.id);
   const selectedShot = scene?.shots.find(shot => shot.id === route.shot);
   const routeError = route.error ?? (catalog && (route.project && !summary
     ? `Unknown project "${route.project}".`
@@ -47,13 +57,15 @@ export function Studio() {
     setFrame(0);
     setPlaying(false);
     setPreviewAttempt(0);
+    setGeometry(undefined);
+    setAnnotationMode('none');
     setStatus('loading');
     setNotice('Loading preview…');
   }, [projectId, sceneId, routeError]);
 
   const seek = useCallback((target: number, gate = true) => {
     if (!scene) return;
-    const bounded = Math.min(scene.durationFrames - 1, Math.max(0, Math.round(target)));
+    const bounded = clampFrame(target, scene.durationFrames);
     frameRef.current = bounded;
     setFrame(bounded);
     if (gate) {
@@ -64,6 +76,18 @@ export function Studio() {
     }
     player.current?.seekTo(bounded);
   }, [scene]);
+
+  useEffect(() => {
+    const sha = review.data?.sourceSha256;
+    if (!sha || !scene || routeError) return;
+    const key = `${projectId}/${sceneId}`;
+    const previous = previewSource.current; previewSource.current = {key, sha};
+    if (previous?.key !== key || previous.sha === sha) return;
+    player.current?.pause(); setPlaying(false);
+    confirmed.current = null; pending.current = frameRef.current;
+    setStatus('loading'); setNotice('Source changed. Reloading the selected frame…');
+    setPreviewAttempt(value => value + 1);
+  }, [review.data?.sourceSha256, projectId, sceneId, routeError]);
 
   useEffect(() => {
     let cancelled = false;
@@ -180,9 +204,9 @@ export function Studio() {
         return;
       }
       if (event.data.type !== 'rendered') return;
-      const shot = scene.shots.find(candidate => new URL(iframe.src).pathname.endsWith(`/${candidate.entry}`));
+      const shot = scene.shots.find(candidate => candidate.id === iframe.dataset.framecraftShotId);
       if (!shot || !Number.isSafeInteger(event.data.frame) || event.data.frame < 0 || event.data.frame >= shot.durationFrames) return;
-      const target = shot.startFrame + event.data.frame;
+      const target = shotFrameToSceneFrame(shot.id, event.data.frame, scene);
       confirmed.current = target;
       if (pending.current !== target) return;
       pending.current = null;
@@ -231,6 +255,8 @@ export function Studio() {
     navigate({project: project!.id, scene: scene!.id, shot: shot.id}, true);
   };
 
+  const pauseSeek = (target: number) => {player.current?.pause(); setPlaying(false); seek(target);};
+
   useEffect(() => {
     if (!scene || routeError) return;
     const onKeyDown = (event: KeyboardEvent) => {
@@ -241,7 +267,12 @@ export function Studio() {
         toggle();
       } else if (event.code === 'ArrowLeft' || event.code === 'ArrowRight') {
         event.preventDefault();
-        step(event.code === 'ArrowRight' ? 1 : -1);
+        if (event.shiftKey) pauseSeek(adjacentShotFrame(frameRef.current, event.code === 'ArrowRight' ? 1 : -1, scene));
+        else step(event.code === 'ArrowRight' ? 1 : -1);
+      } else if (event.code === 'Home' || event.code === 'End') {
+        event.preventDefault(); pauseSeek(event.code === 'Home' ? 0 : scene.durationFrames - 1);
+      } else if (event.key === '+' || event.key === '=' || event.key === '-' || event.key === '0') {
+        event.preventDefault(); setZoom(v => event.key === '0' ? 1 : event.key === '-' ? Math.max(1, v / 2) : Math.min(16, v * 2));
       }
     };
     addEventListener('keydown', onKeyDown);
@@ -338,6 +369,7 @@ export function Studio() {
               durationInFrames={scene.durationFrames}
               initialFrame={previewAttempt ? frame : selectedShot?.startFrame ?? 0}
               fps={project.video.fps}
+              playbackRate={rate}
               controls={false}
               loop={false}
               moveToBeginningWhenEnded={false}
@@ -347,6 +379,7 @@ export function Studio() {
               spaceKeyToPlayOrPause={false}
               style={{width: '100%', height: '100%'}}
             />
+            <AnnotationOverlay issues={review.data?.feedback.issues ?? []} frame={frame} mode={annotationMode} draft={geometry} onGeometry={setGeometry}/>
             {status !== 'ready' && <div className="overlay" role={status === 'error' ? 'alert' : 'status'}>
               <p>{notice}</p>
               {status === 'error' && <button type="button" onClick={() => {
@@ -360,25 +393,27 @@ export function Studio() {
           </div>
 
           <div className="transport">
+            <button type="button" onClick={() => pauseSeek(0)} aria-label="Jump to start">Start</button>
+            <button type="button" onClick={() => pauseSeek(adjacentShotFrame(frame, -1, scene))}>Previous shot</button>
             <button type="button" onClick={() => step(-1)} aria-label="Previous frame">Prev</button>
             <button type="button" className="play" onClick={toggle} aria-label={playing ? 'Pause' : 'Play'}>{playing ? 'Pause' : 'Play'}</button>
             <button type="button" onClick={() => step(1)} aria-label="Next frame">Next</button>
+            <button type="button" onClick={() => pauseSeek(adjacentShotFrame(frame, 1, scene))}>Next shot</button>
+            <button type="button" onClick={() => pauseSeek(scene.durationFrames - 1)} aria-label="Jump to end">End</button>
+            <button type="button" onClick={() => pauseSeek(0)}>Stop</button>
+            <label>Speed <select aria-label="Playback speed" value={rate} onChange={e => setRate(Number(e.currentTarget.value))}>{[.25, .5, 1, 2].map(v => <option value={v} key={v}>{v}×</option>)}</select></label>
             <p className="timecode"><output aria-label="Current and total time">{formatTime(frame, project.video.fps)}</output><span className="muted"> / {formatTime(scene.durationFrames, project.video.fps)}</span></p>
           </div>
 
-          <div className="timeline">
-            <h2 className="sr-only">Timeline</h2>
-            <div className="track">
-              <div className="segments" aria-hidden="true">
-                {scene.shots.map(shot => <span key={shot.id} data-active={shot.id === active?.id} style={{flexGrow: shot.durationFrames}} />)}
-              </div>
-              <input type="range" aria-label="Timeline frame" min={0} max={scene.durationFrames - 1} step={1} value={frame}
-                onChange={event => seek(Number(event.currentTarget.value))} />
-            </div>
-            <p className="frame-count">Frame {frame} of {scene.durationFrames - 1}</p>
-          </div>
+          <Timeline scene={scene} fps={project.video.fps} frame={frame} zoom={zoom} setZoom={setZoom} seek={pauseSeek}/>
+          <details className="shortcuts"><summary>Keyboard shortcuts</summary><p>Space: play/pause. Left/Right: one frame. Shift+Left/Right: previous/next shot. Home/End: scene start/end. +/−: timeline zoom. 0: fit scene. Shortcuts do not run in form fields or editable text.</p></details>
         </section>
+        <aside className="inspector" aria-label="Shot inspector">
+          <h2>Shot inspector</h2><dl><dt>Project / scene</dt><dd>{project.id} / {scene.id}</dd><dt>Current frame</dt><dd data-testid="inspector-frame">{frame}</dd><dt>Shot</dt><dd data-testid="inspector-shot">{active?.id}</dd><dt>Frame range</dt><dd>{active && `[${active.startFrame}, ${active.startFrame + active.durationFrames})`}</dd><dt>Duration</dt><dd>{active?.durationFrames} frames</dd><dt>Source entry</dt><dd><code>{active?.entry}</code></dd><dt>Declared audio assets</dt><dd>{[...new Set([...(active?.audio ?? []), ...scene.audio].map(c => c.src))].join(', ') || 'None'}</dd></dl>
+          <ReviewPanel key={`${project.id}/${scene.id}`} review={review} projectId={project.id} scene={scene} frame={frame} ready={!playing && status === 'ready'} seek={pauseSeek} geometry={geometry} setGeometry={setGeometry} mode={annotationMode} setMode={setAnnotationMode}/>
+        </aside>
       </div>
+      {review.data && <Comparison key={`${project.id}/${scene.id}/${review.data.revisions.map(r => r.id).join(',')}`} revisions={review.data.revisions}/>}
     </>}
   </main>;
 }

@@ -1,0 +1,2 @@
+$ bun scripts/production.ts cleanup --project projects/production-desktop --scene desk --run "cbf0fd43-ebcc-48dc-a8b7-e1c1d33361c7"
+{"filesRemoved":0,"bytesReclaimed":0,"preserved":[],"failures":[]}

@@ -1,0 +1,112 @@
+[
+  {
+    "src": "assets/audio/open-press.wav",
+    "category": "press",
+    "sha256": "453e88f9a4913e2a175cda519782b4db41a630376040c0d696abbc0ec449d365",
+    "provenance": {
+      "kind": "original-synthesis",
+      "author": "Framecraft acceptance exercise",
+      "license": "CC0-1.0, original generated PCM released for reuse",
+      "recipe": "production/synthesize.ts"
+    }
+  },
+  {
+    "src": "assets/audio/open-release.wav",
+    "category": "release",
+    "sha256": "bbbef556718f3faee124f3794cd81016577ce1726c0ec6f44198f13c37820a51",
+    "provenance": {
+      "kind": "original-synthesis",
+      "author": "Framecraft acceptance exercise",
+      "license": "CC0-1.0, original generated PCM released for reuse",
+      "recipe": "production/synthesize.ts"
+    }
+  },
+  {
+    "src": "assets/audio/typing.wav",
+    "category": "key",
+    "sha256": "7ab710797476d05bbe286646c41d677f710d37bf7a0bfb3d257e56c3c7cc0793",
+    "provenance": {
+      "kind": "original-synthesis",
+      "author": "Framecraft acceptance exercise",
+      "license": "CC0-1.0, original generated PCM released for reuse",
+      "recipe": "production/synthesize.ts"
+    }
+  },
+  {
+    "src": "assets/audio/confirm.wav",
+    "category": "key",
+    "sha256": "9e4f1483782a8316e011370c30e3d13aaaa571b8104cbe51c1a33980368231ad",
+    "provenance": {
+      "kind": "original-synthesis",
+      "author": "Framecraft acceptance exercise",
+      "license": "CC0-1.0, original generated PCM released for reuse",
+      "recipe": "production/synthesize.ts"
+    }
+  },
+  {
+    "src": "assets/audio/grip-press.wav",
+    "category": "press",
+    "sha256": "105ff5f1b7e04a71bc92fda662f8d415a8c89ca894c192811e638322aff7b3fd",
+    "provenance": {
+      "kind": "original-synthesis",
+      "author": "Framecraft acceptance exercise",
+      "license": "CC0-1.0, original generated PCM released for reuse",
+      "recipe": "production/synthesize.ts"
+    }
+  },
+  {
+    "src": "assets/audio/grab.wav",
+    "category": "grab",
+    "sha256": "bcb0801275e4a254f9e1a54c2cf522baa12e9543b09f3fd5baf732e441ba1127",
+    "provenance": {
+      "kind": "original-synthesis",
+      "author": "Framecraft acceptance exercise",
+      "license": "CC0-1.0, original generated PCM released for reuse",
+      "recipe": "production/synthesize.ts"
+    }
+  },
+  {
+    "src": "assets/audio/drag.wav",
+    "category": "drag",
+    "sha256": "cc9b5395954f0905a6ae6ea23d78e5fe348b17ef10ceab46bc2a5bf2a9b41cc8",
+    "provenance": {
+      "kind": "original-synthesis",
+      "author": "Framecraft acceptance exercise",
+      "license": "CC0-1.0, original generated PCM released for reuse",
+      "recipe": "production/synthesize.ts"
+    }
+  },
+  {
+    "src": "assets/audio/grip-release.wav",
+    "category": "release",
+    "sha256": "db29139b4053a0d8a2eb5ffc97e3b7e38e98ed63b82968cf069987cc025835e2",
+    "provenance": {
+      "kind": "original-synthesis",
+      "author": "Framecraft acceptance exercise",
+      "license": "CC0-1.0, original generated PCM released for reuse",
+      "recipe": "production/synthesize.ts"
+    }
+  },
+  {
+    "src": "assets/audio/drop.wav",
+    "category": "drop",
+    "sha256": "e9a68d87b186d53c76325352b028da34400dbf5a6637f507f89972431cc4a062",
+    "provenance": {
+      "kind": "original-synthesis",
+      "author": "Framecraft acceptance exercise",
+      "license": "CC0-1.0, original generated PCM released for reuse",
+      "recipe": "production/synthesize.ts"
+    }
+  },
+  {
+    "src": "assets/audio/camera-paper.wav",
+    "category": "transition",
+    "sha256": "98cc0f427d2325baea5d11bbcaf0e02ff6fd58200ad6beefba43fa87dd344324",
+    "provenance": {
+      "kind": "original-synthesis",
+      "author": "Framecraft acceptance exercise",
+      "license": "CC0-1.0, original generated PCM released for reuse",
+      "recipe": "production/synthesize.ts"
+    }
+  }
+]

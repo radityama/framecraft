@@ -1,4 +1,5 @@
 import type {Shot} from '../spike/project';
+import {shotFrameToSceneFrame} from '../timeline';
 
 export const SELECTION_POLICY = 'boundaries-midpoints-v1' as const;
 type ReviewShot = Pick<Shot, 'id' | 'startFrame' | 'durationFrames'>;
@@ -27,7 +28,7 @@ export function selectReviewFrames(shots: ReviewShot[], milestones: string[]): R
   }
   return shots.flatMap(shot =>
     [...selected.get(shot.id)!].map(localFrame => {
-      const globalFrame = shot.startFrame + localFrame;
+      const globalFrame = shotFrameToSceneFrame(shot.id, localFrame, {shots});
       return {shotId: shot.id, localFrame, globalFrame,
         path: `screenshots/${shot.id}-local-${String(localFrame).padStart(4, '0')}-global-${String(globalFrame).padStart(4, '0')}.png`};
     })).sort((a, b) => a.globalFrame - b.globalFrame || a.shotId.localeCompare(b.shotId));

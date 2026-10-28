@@ -1,0 +1,6 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><link rel="stylesheet" href="../../../../assets/fonts/fonts.css"><link rel="stylesheet" href="../../../../assets/examples.css"><title>Cursor trajectory</title>
+<h1>Cursor trajectory</h1><div id="target" style="position:absolute;left:390px;top:170px;width:150px;height:60px;display:grid;place-content:center;background:#4a8ad6;color:#111">Render frame</div><svg id="cursor" width="26" height="32" viewBox="0 0 26 32" style="position:absolute;left:0;top:0"><path d="M2 2 L2 27 L9 20 L15 30 L21 27 L15 17 L25 17 Z" fill="white" stroke="#171719" stroke-width="2"/></svg><p class="label">Explicit Bézier controls. Click at frame 55.</p>
+<script src="../../../../runtime.js"></script><script src="../../../../assets/motion.js"></script><script>
+const m=framecraftMotion, cursor=document.querySelector('#cursor'), target=document.querySelector('#target');
+framecraft.shot({renderFrame(ctx){const p=m.cursor(ctx.frame,{from:{x:100,y:260},to:{x:450,y:190},control1:{x:230,y:280},control2:{x:340,y:100},duration:55,clickFrame:55,clickDuration:6});m.apply(cursor,{x:p.x,y:p.y,scale:p.clicking?.9:1});target.style.background=p.clicking?'#7db4ee':'#4a8ad6';}});
+</script></html>

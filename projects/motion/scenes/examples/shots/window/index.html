@@ -1,0 +1,6 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><link rel="stylesheet" href="../../../../assets/fonts/fonts.css"><link rel="stylesheet" href="../../../../assets/examples.css"><title>Window transform</title>
+<h1>Window transform</h1><div id="window" style="position:absolute;left:160px;top:110px;width:320px;height:170px;background:#303034"><div style="padding:12px;background:#44444a">Local preview</div><p style="padding:12px">One frame. Complete state.</p></div><p class="label">Translation and scale share explicit keyframes.</p>
+<script src="../../../../runtime.js"></script><script src="../../../../assets/motion.js"></script><script>
+const m=framecraftMotion, node=document.querySelector('#window');
+framecraft.shot({renderFrame(ctx){m.apply(node,{x:m.keyframes(ctx.frame,[{frame:0,value:-80,ease:m.easing.cubic},{frame:60,value:30}]),scale:m.keyframes(ctx.frame,[{frame:0,value:.55,ease:m.easing.cubic},{frame:60,value:1}])});}});
+</script></html>

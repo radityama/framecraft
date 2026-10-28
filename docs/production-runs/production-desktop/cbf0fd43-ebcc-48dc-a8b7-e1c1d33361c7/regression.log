@@ -1,0 +1,22 @@
+bun test v1.4.4 (38afee6c8)
+
+tests/studio-browser.test.ts:
+65 |     const middle = await stage(page).screenshot();
+66 |     await seek(page, 10);
+67 |     await seek(page, 70);
+68 |     const again = await stage(page).screenshot();
+69 |     expect(Buffer.compare(first, middle)).not.toBe(0);
+70 |     expect(Buffer.compare(middle, again)).toBe(0);
+                                               ^
+error: expect(received).toBe(expected)
+
+Expected: 0
+Received: -1
+
+      at <anonymous> (/home/radityra/projects/framecraft/tests/studio-browser.test.ts:70:43)
+(fail) seeks across shot boundaries and matches the renderer at repeated frames [2398.24ms]
+
+ 124 pass
+ 1 fail
+ 1089 expect() calls
+Ran 125 tests across 31 files. [393.27s]

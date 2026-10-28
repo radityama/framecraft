@@ -1,0 +1,6 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><link rel="stylesheet" href="../../../../assets/fonts/fonts.css"><link rel="stylesheet" href="../../../../assets/examples.css"><title>Camera focus</title>
+<div id="world" style="position:absolute;inset:0;transform-origin:0 0"><div style="position:absolute;left:80px;top:140px;width:120px;height:80px;background:#3a3a3e;display:grid;place-content:center">Context</div><div style="position:absolute;left:380px;top:130px;width:140px;height:100px;background:#4a8ad6;color:#111;display:grid;place-content:center">Focus</div></div><h1>Camera focus</h1><p class="label">2D pan and zoom. No new rendering engine.</p>
+<script src="../../../../runtime.js"></script><script src="../../../../assets/motion.js"></script><script>
+const m=framecraftMotion, world=document.querySelector('#world');
+framecraft.shot({renderFrame(ctx){const pose=m.camera(ctx.frame,{from:{x:320,y:180,zoom:1},to:{x:450,y:180,zoom:1.7},start:0,duration:70,viewport:{width:ctx.width,height:ctx.height}});m.apply(world,{...pose,originX:0,originY:0});}});
+</script></html>

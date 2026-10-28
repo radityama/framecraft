@@ -1,0 +1,6 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><link rel="stylesheet" href="../../../../assets/fonts/fonts.css"><link rel="stylesheet" href="../../../../assets/examples.css"><title>Typography reveals</title>
+<h1>Typography reveals</h1><main style="position:absolute;left:60px;top:110px;font-size:30px"><div id="words"><span style="display:inline-block">Frame</span> <span style="display:inline-block">by</span> <span style="display:inline-block">frame.</span></div><div id="chars" style="margin-top:20px"></div><div id="line" style="margin-top:20px">A line in motion.</div></main><p class="label">Word, character and line reveals. Fonts remain author-controlled.</p>
+<script src="../../../../runtime.js"></script><script src="../../../../assets/motion.js"></script><script>
+const m=framecraftMotion; for(const c of 'Exact timing.'){const s=document.createElement('span');s.style.display='inline-block';s.textContent=c===' '?'\u00a0':c;document.querySelector('#chars').append(s);}
+framecraft.shot({renderFrame(ctx){m.reveal(document.querySelector('#words').children,ctx.frame,{start:0,delay:5,duration:18});m.reveal(document.querySelector('#chars').children,ctx.frame,{start:15,delay:2,duration:15,distance:12});m.reveal([document.querySelector('#line')],ctx.frame,{start:35,duration:25,distance:20});}});
+</script></html>

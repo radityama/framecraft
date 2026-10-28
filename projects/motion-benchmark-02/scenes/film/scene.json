@@ -1,0 +1,11 @@
+{
+  "id": "film",
+  "title": "The frame becomes the system",
+  "shots": [
+    {"id": "wake", "entry": "shots/wake/index.html", "durationFrames": 360, "overlapFrames": 0},
+    {"id": "desktop", "entry": "shots/desktop/index.html", "durationFrames": 450, "overlapFrames": 0},
+    {"id": "story", "entry": "shots/story/index.html", "durationFrames": 450, "overlapFrames": 0},
+    {"id": "resolve", "entry": "shots/resolve/index.html", "durationFrames": 390, "overlapFrames": 0}
+  ],
+  "audio": []
+}

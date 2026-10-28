@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "sha256": {
+    "demo": "c14ff630deebdaa2bdcbc8b085283953ce3b2a35a547aefb0b17e05e57db9e78",
+    "showcase": "670d3b8ff2ec795632bca6eedde02597aee0c5b8df4ce15f91207217015bd167",
+    "motion": "e0765df2c2ee0bb9fc08112d76f1ad053815590bc97cdda898ae920bf02fbb85"
+  },
+  "comparison": "Compare with the pre-existing Phase 4 report; these are current measurements, not a fresh pre-change snapshot."
+}

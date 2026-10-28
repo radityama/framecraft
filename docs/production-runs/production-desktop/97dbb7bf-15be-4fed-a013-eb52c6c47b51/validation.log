@@ -1,0 +1,3 @@
+bun run validate: exit 0
+workspace: 450 frames (15 seconds)
+$ bun scripts/validate.ts --project /home/radityra/projects/framecraft/projects/production-desktop --scene desk

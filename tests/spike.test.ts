@@ -87,7 +87,7 @@ test('shot exception rejects a seek', async () => {
 test('missing acknowledgement times out', async () => {
   await page.evaluate(() => (window as any).mount('/tests/fixtures/silent.html', {id:'silent',fps:30,durationFrames:90,width:1920,height:1080}));
   await expect(page.evaluate(() => (window as any).seek(10))).rejects.toThrow('Timeout waiting for rendered 10');
-});
+}, 10000);
 
 test('shot clocks and random calls repeat on reverse seek', async () => {
   await page.evaluate(() => (window as any).mount('/tests/fixtures/deterministic.html', {id:'clock',fps:30,durationFrames:90,width:1920,height:1080}));

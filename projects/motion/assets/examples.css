@@ -1,0 +1,4 @@
+@import url('fonts/fonts.css');
+html, body {margin:0; width:100%; height:100%; overflow:hidden; background:#171719; color:white; font-family:"IBM Plex Sans",sans-serif;}
+h1 {position:absolute; left:32px; top:20px; margin:0; font-size:24px; font-weight:500;}
+.label {position:absolute; bottom:20px; left:32px; margin:0; font-size:14px; color:#b6b8be;}

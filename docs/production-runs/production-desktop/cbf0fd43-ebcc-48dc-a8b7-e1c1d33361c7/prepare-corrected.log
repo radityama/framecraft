@@ -1,0 +1,3 @@
+$ bun scripts/production.ts prepare --project projects/production-desktop --scene desk
+Production run: cbf0fd43-ebcc-48dc-a8b7-e1c1d33361c7
+Prepared 40 frames. Inspect /home/radityra/projects/framecraft/output/production-desktop/.work/cbf0fd43-ebcc-48dc-a8b7-e1c1d33361c7 and write /home/radityra/projects/framecraft/docs/production-runs/production-desktop/cbf0fd43-ebcc-48dc-a8b7-e1c1d33361c7/creative-review.json. No approval was generated.

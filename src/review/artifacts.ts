@@ -100,7 +100,7 @@ function digest(value: unknown, field: string): void {
   if (typeof value !== 'string' || !shaPattern.test(value)) throw new Error(`${field} must be a SHA-256 hash`);
 }
 
-function parseManifest(value: unknown): ReviewManifest {
+export function parseManifest(value: unknown): ReviewManifest {
   const manifest = object(value, 'manifest');
   if (manifest.schemaVersion !== 1) throw new Error('schemaVersion must be 1');
   text(manifest.projectId, 'projectId');

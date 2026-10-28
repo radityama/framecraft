@@ -1,0 +1,1 @@
+{"schemaVersion":1,"id":"motion","title":"Motion primitives","video":{"width":640,"height":360,"fps":30,"background":"#171719"},"scenes":[{"id":"examples","path":"scenes/examples/scene.json"}],"audio":[]}

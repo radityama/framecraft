@@ -1,0 +1,1 @@
+{"schemaVersion":1,"id":"production-desktop","title":"A little room to think","video":{"width":1920,"height":1080,"fps":30},"scenes":[{"id":"desk","path":"scenes/desk/scene.json"}],"audio":[]}
